@@ -14,7 +14,7 @@ class Errors extends MY_Controller
         //$this->load->view('default/views/errors/rectangle', $data); // For rectangle 404 page
     }
 
-    
+
     public function show_error()
     {
         show_error('This is general error message.');
