@@ -1,0 +1,3 @@
+name,code,barcode_symbology,unit,sale_unit,purchase_unit,cost,price,alert_quantity,tax_rate,tax_method,quantity,discount,min_selling_rice,landing_price
+TP T470 8G 500 W10P,48354,code128,pc,pc,pc,1255.23,1499.99,1,HST,1,1,0,1255.23,1255.23
+OES FEES,44515,code128,pc,pc,pc,0.75,0.75,1,HST,1,1,0,0.75,0.75

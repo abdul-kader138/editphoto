@@ -1,0 +1,18 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2017-03-22 09:54:23 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 09:54:23 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-03-22 09:54:26 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 09:54:26 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-03-22 09:54:37 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 09:54:37 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-03-22 09:54:43 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 09:54:43 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-03-22 09:54:46 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 09:54:46 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-03-22 14:27:52 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 14:27:52 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-03-22 14:28:02 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 14:28:02 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-03-22 14:29:19 --> Could not find the language line "attendance"
+ERROR - 2017-03-22 14:29:19 --> Could not find the language line "Time Schedule Report"

@@ -1,0 +1,6 @@
+
+ALTER TABLE `sma_permissions` ADD `correction_request-add` TINYINT(1) NOT NULL DEFAULT '0' AFTER `approval_manpower_requisition`;
+ALTER TABLE `sma_permissions` ADD `correction_request-edit` TINYINT(1) NOT NULL DEFAULT '0' AFTER `approval_manpower_requisition`;
+ALTER TABLE `sma_permissions` ADD `correction_request-index` TINYINT(1) NOT NULL DEFAULT '0' AFTER `approval_manpower_requisition`;
+ALTER TABLE `sma_permissions` ADD `correction_request-delete` TINYINT(1) NOT NULL DEFAULT '0' AFTER `approval_manpower_requisition`;
+ALTER TABLE `sma_permissions` ADD `correction_request_approval` TINYINT(1) NOT NULL DEFAULT '0' AFTER `approval_manpower_requisition`;

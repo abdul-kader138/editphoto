@@ -1,0 +1,32 @@
+[10-Mar-2017 14:44:22 Africa/Abidjan] PHP Fatal error:  session_start(): Failed to initialize storage module: user (path: sessions) in /home/mypos798/public_html/mypossoft_v2/system/libraries/Session/Session.php on line 143
+[10-Mar-2017 14:45:16 Africa/Abidjan] PHP Fatal error:  session_start(): Failed to initialize storage module: user (path: sessions) in /home/mypos798/public_html/mypossoft_v2/system/libraries/Session/Session.php on line 143
+[10-Mar-2017 14:46:16 Africa/Abidjan] PHP Fatal error:  session_start(): Failed to initialize storage module: user (path: sessions) in /home/mypos798/public_html/mypossoft_v2/system/libraries/Session/Session.php on line 143
+[10-Mar-2017 14:46:17 Africa/Abidjan] PHP Fatal error:  session_start(): Failed to initialize storage module: user (path: sessions) in /home/mypos798/public_html/mypossoft_v2/system/libraries/Session/Session.php on line 143
+[10-Mar-2017 14:49:39 Africa/Abidjan] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Site.php on line 30
+[10-Mar-2017 14:49:39 Africa/Abidjan] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Site.php on line 30
+[10-Mar-2017 14:49:52 Africa/Abidjan] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Site.php on line 30
+[10-Mar-2017 14:49:53 Africa/Abidjan] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Site.php on line 30
+[14-Mar-2017 09:38:46 America/Toronto] PHP Parse error:  syntax error, unexpected end of file in /home/mypos798/public_html/mypossoft_v2/app/controllers/System_settings.php on line 3099
+[14-Mar-2017 09:38:53 America/Toronto] PHP Parse error:  syntax error, unexpected end of file in /home/mypos798/public_html/mypossoft_v2/app/controllers/System_settings.php on line 3099
+[14-Mar-2017 09:39:04 America/Toronto] PHP Parse error:  syntax error, unexpected end of file in /home/mypos798/public_html/mypossoft_v2/app/controllers/System_settings.php on line 3099
+[20-Mar-2017 09:42:54 America/Toronto] PHP Fatal error:  Call to a member function row() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Time_scheduler_model.php on line 22
+[20-Mar-2017 09:42:55 America/Toronto] PHP Fatal error:  Call to a member function row() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Time_scheduler_model.php on line 22
+[20-Mar-2017 09:43:04 America/Toronto] PHP Fatal error:  Call to a member function row() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Time_scheduler_model.php on line 22
+[20-Mar-2017 09:43:09 America/Toronto] PHP Fatal error:  Call to a member function row() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Time_scheduler_model.php on line 22
+[20-Mar-2017 09:44:41 America/Toronto] PHP Fatal error:  Call to a member function row() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Time_scheduler_model.php on line 22
+[12-Apr-2017 14:19:08 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Db_model.php on line 75
+[12-Apr-2017 14:19:13 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Db_model.php on line 75
+[12-Apr-2017 14:22:00 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/models/Db_model.php on line 136
+[12-Apr-2017 21:22:07 America/Toronto] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 22774144 bytes) in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 400
+[12-Apr-2017 21:22:39 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[12-Apr-2017 21:22:40 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[12-Apr-2017 21:22:41 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[12-Apr-2017 21:23:27 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[12-Apr-2017 21:25:39 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[12-Apr-2017 21:26:00 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[12-Apr-2017 21:26:01 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[12-Apr-2017 21:26:02 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[13-Apr-2017 01:22:04 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[13-Apr-2017 01:22:21 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[13-Apr-2017 01:22:21 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438
+[13-Apr-2017 01:33:54 America/Toronto] PHP Fatal error:  Call to a member function num_rows() on boolean in /home/mypos798/public_html/mypossoft_v2/app/libraries/Datatables.php on line 438

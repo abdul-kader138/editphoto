@@ -1,0 +1,17 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2017-05-01 06:59:38 --> Could not find the language line "attendance"
+ERROR - 2017-05-01 06:59:38 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-05-01 06:59:47 --> Could not find the language line "attendance"
+ERROR - 2017-05-01 06:59:47 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-05-01 06:59:47 --> Could not find the language line "purchase_count"
+ERROR - 2017-05-01 06:59:47 --> Could not find the language line "Sub Category"
+ERROR - 2017-05-01 06:59:47 --> Could not find the language line "Purchase_Count"
+ERROR - 2017-05-01 06:59:47 --> Could not find the language line "Purchase History"
+ERROR - 2017-05-01 06:59:53 --> Could not find the language line "attendance"
+ERROR - 2017-05-01 06:59:53 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-05-01 06:59:53 --> Could not find the language line "site_name"
+ERROR - 2017-05-01 07:00:10 --> Could not find the language line "attendance"
+ERROR - 2017-05-01 07:00:10 --> Could not find the language line "Time Schedule Report"
+ERROR - 2017-05-01 07:00:18 --> Could not find the language line "Landing Price"
+ERROR - 2017-05-01 07:00:18 --> Could not find the language line "Min Selling Price"
