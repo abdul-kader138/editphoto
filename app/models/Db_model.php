@@ -46,4 +46,14 @@ class Db_model extends CI_Model
         return FALSE;
     }
 
+    public function getTotalUsers()
+    {
+        $this->db->select('count(id) as total', FALSE);
+        if (!$this->Owner && !$this->Admin) $this->db->where('users.id', $this->session->userdata('user_id'));
+        $q = $this->db->get('users');
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
 }

@@ -23,9 +23,12 @@ class Welcome extends MY_Controller
         }
 
         $this->data['error'] = (validation_errors() ? validation_errors() : $this->session->flashdata('error'));
-        $this->data['total_mr'] = $this->db_model->getTotalMRApproval($this->session->userdata('user_id'));
-        $this->data['total_ar'] = $this->db_model->getTotalRAApproval($this->session->userdata('user_id'));
-        $this->data['total_cr'] = $this->db_model->getTotalCRApproval($this->session->userdata('user_id'));
+//        $this->data['total_mr'] = $this->db_model->getTotalMRApproval($this->session->userdata('user_id'));
+        $this->data['total_users'] = $this->db_model->getTotalUsers();
+        $this->data['total_ar'] =0;
+//        $this->data['total_ar'] = $this->db_model->getTotalRAApproval($this->session->userdata('user_id'));
+        $this->data['total_cr'] = 0;
+//        $this->data['total_cr'] = $this->db_model->getTotalCRApproval($this->session->userdata('user_id'));
         $bc = array(array('link' => '#', 'page' => lang('dashboard')));
         $meta = array('page_title' => lang('dashboard'), 'bc' => $bc);
         $this->page_construct('dashboard', $meta, $this->data);

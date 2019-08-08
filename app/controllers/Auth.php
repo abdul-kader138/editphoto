@@ -50,11 +50,10 @@ class Auth extends MY_Controller
 
         $this->load->library('datatables');
         $this->datatables
-            ->select($this->db->dbprefix('users').".id as id, first_name, last_name, email, company, award_points, " . $this->db->dbprefix('groups') . ".name, active")
+            ->select($this->db->dbprefix('users').".id as id, first_name, last_name, email, company, phone, " . $this->db->dbprefix('groups') . ".name, active")
             ->from("users")
             ->join('groups', 'users.group_id=groups.id', 'left')
             ->group_by('users.id')
-            ->where('company_id', NULL)
             ->edit_column('active', '$1__$2', 'active, id')
             ->add_column("Actions", "<div class=\"text-center\"><a href='" . site_url('auth/profile/$1') . "' class='tip' title='" . lang("edit_user") . "'><i class=\"fa fa-edit\"></i></a></div>", "id");
 
@@ -116,8 +115,7 @@ class Auth extends MY_Controller
         $this->data['csrf'] = $this->_get_csrf_nonce();
         $this->data['user'] = $user;
         $this->data['groups'] = $groups;
-        $this->data['billers'] = $this->site->getAllCompanies('biller');
-//        $this->data['warehouses'] = $this->site->getAllWarehouses();
+        $this->data['countries'] = $this->site->getAllCountry();
 
         $this->data['error'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('error');
         $this->data['password'] = array(
@@ -210,9 +208,6 @@ class Auth extends MY_Controller
                         $this->session->set_flashdata('error', lang('site_is_offline_plz_try_later'));
                         redirect('auth/logout');
                     }
-                }
-                if ($this->ion_auth->in_group('customer') || $this->ion_auth->in_group('supplier')) {
-                    redirect('auth/logout/1');
                 }
                 $this->session->set_flashdata('message', $this->ion_auth->messages());
                 $referrer = $this->session->userdata('requested_page') ? $this->session->userdata('requested_page') : 'welcome';
@@ -523,12 +518,14 @@ class Auth extends MY_Controller
         $this->form_validation->set_rules('email', lang("email"), 'trim|is_unique[users.email]');
         $this->form_validation->set_rules('status', lang("status"), 'trim|required');
         $this->form_validation->set_rules('group', lang("group"), 'trim|required');
+        $this->form_validation->set_rules('country', lang("country"), 'trim|required');
 
         if ($this->form_validation->run() == true) {
 
             $username = strtolower($this->input->post('username'));
             $email = strtolower($this->input->post('email'));
             $password = $this->input->post('password');
+            $doc_path=$this->input->post('first_name') ." ".$this->input->post('last_name')." (".$username.")";
             $notify = $this->input->post('notify');
 
             $additional_data = array(
@@ -536,19 +533,19 @@ class Auth extends MY_Controller
                 'last_name' => $this->input->post('last_name'),
                 'company' => $this->input->post('company'),
                 'phone' => $this->input->post('phone'),
+                'country' => $this->input->post('country'),
                 'gender' => $this->input->post('gender'),
+                'document_path' => $doc_path,
                 'group_id' => $this->input->post('group') ? $this->input->post('group') : '3',
-                'biller_id' => $this->input->post('biller'),
-                'warehouse_id' => $this->input->post('warehouse'),
                 'view_right' => $this->input->post('view_right'),
                 'edit_right' => $this->input->post('edit_right'),
-                'document_path' => $this->input->post('document_path'),
-                'allow_discount' => $this->input->post('allow_discount'),
             );
             $active = $this->input->post('status');
         }
         if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data, $active, $notify)) {
-
+            if (!file_exists('assets/uploads/docs/'.$doc_path)) {
+                mkdir('assets/uploads/docs/'.$doc_path, 0777, true);
+            }
             $this->session->set_flashdata('message', $this->ion_auth->messages());
             redirect("auth/users");
 
@@ -556,8 +553,7 @@ class Auth extends MY_Controller
 
             $this->data['error'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('error')));
             $this->data['groups'] = $this->ion_auth->groups()->result_array();
-            $this->data['billers'] = $this->site->getAllCompanies('biller');
-//            $this->data['warehouses'] = $this->site->getAllWarehouses();
+            $this->data['countries'] = $this->site->getAllCountry();
             $bc = array(array('link' => site_url('home'), 'page' => lang('home')), array('link' => site_url('auth/users'), 'page' => lang('users')), array('link' => '#', 'page' => lang('create_user')));
             $meta = array('page_title' => lang('users'), 'bc' => $bc);
             $this->page_construct('auth/create_user', $meta, $this->data);

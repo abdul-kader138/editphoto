@@ -35,10 +35,6 @@ class MY_Controller extends CI_Controller {
             $this->data['default_currency'] = $this->default_currency;
             $this->Owner = $this->sma->in_group('owner') ? TRUE : NULL;
             $this->data['Owner'] = $this->Owner;
-            $this->Customer = $this->sma->in_group('customer') ? TRUE : NULL;
-            $this->data['Customer'] = $this->Customer;
-            $this->Supplier = $this->sma->in_group('supplier') ? TRUE : NULL;
-            $this->data['Supplier'] = $this->Supplier;
             $this->Admin = $this->sma->in_group('admin') ? TRUE : NULL;
             $this->data['Admin'] = $this->Admin;
 
@@ -61,11 +57,6 @@ class MY_Controller extends CI_Controller {
                     'php_ldate' => 'm-d-Y H:i:s',
                     'mysql_ldate' => '%m-%d-%Y %T'
                     );
-            }
-            if(file_exists(APPPATH.'controllers'.DIRECTORY_SEPARATOR.'Pos.php')) {
-                define("POS", 1);
-            } else {
-                define("POS", 0);
             }
             if(!$this->Owner && !$this->Admin) {
                 $gp = $this->site->checkPermissions();
@@ -91,13 +82,9 @@ class MY_Controller extends CI_Controller {
         $meta['message'] = isset($data['message']) ? $data['message'] : $this->session->flashdata('message');
         $meta['error'] = isset($data['error']) ? $data['error'] : $this->session->flashdata('error');
         $meta['warning'] = isset($data['warning']) ? $data['warning'] : $this->session->flashdata('warning');
-        $meta['info'] = $this->site->getNotifications();
-        $meta['events'] = $this->site->getUpcomingEvents();
         $meta['ip_address'] = $this->input->ip_address();
         $meta['Owner'] = $data['Owner'];
         $meta['Admin'] = $data['Admin'];
-        $meta['Supplier'] = $data['Supplier'];
-        $meta['Customer'] = $data['Customer'];
         $meta['Settings'] = $data['Settings'];
         $meta['dateFormats'] = $data['dateFormats'];
         $meta['assets'] = $data['assets'];

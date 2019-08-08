@@ -31,32 +31,19 @@ class system_settings extends MY_Controller
             $this->session->set_flashdata('warning', lang('access_denied'));
             redirect('welcome');
         }
-
         $this->form_validation->set_rules('site_name', lang('site_name'), 'trim|required');
         $this->form_validation->set_rules('dateformat', lang('dateformat'), 'trim|required');
         $this->form_validation->set_rules('timezone', lang('timezone'), 'trim|required');
         $this->form_validation->set_rules('mmode', lang('maintenance_mode'), 'trim|required');
-        //$this->form_validation->set_rules('logo', lang('logo'), 'trim');
         $this->form_validation->set_rules('currency', lang('default_currency'), 'trim|required');
         $this->form_validation->set_rules('email', lang('default_email'), 'trim|required');
         $this->form_validation->set_rules('language', lang('language'), 'trim|required');
         $this->form_validation->set_rules('theme', lang('theme'), 'trim|required');
         $this->form_validation->set_rules('rows_per_page', lang('rows_per_page'), 'trim|required|greater_than[9]|less_than[501]');
-//        $this->form_validation->set_rules('bc_fix', lang('bc_fix'), 'trim|numeric|required');
-        $this->form_validation->set_rules('protocol', lang('email_protocol'), 'trim|required');
-        if ($this->input->post('protocol') == 'smtp') {
-            $this->form_validation->set_rules('smtp_host', lang('smtp_host'), 'required');
-            $this->form_validation->set_rules('smtp_user', lang('smtp_user'), 'required');
-            $this->form_validation->set_rules('smtp_pass', lang('smtp_pass'), 'required');
-            $this->form_validation->set_rules('smtp_port', lang('smtp_port'), 'required');
-        }
-        if ($this->input->post('protocol') == 'sendmail') {
-            $this->form_validation->set_rules('mailpath', lang('mailpath'), 'required');
-        }
         $this->form_validation->set_rules('decimals', lang('decimals'), 'trim|required');
         $this->form_validation->set_rules('decimals_sep', lang('decimals_sep'), 'trim|required');
         $this->form_validation->set_rules('thousands_sep', lang('thousands_sep'), 'trim|required');
-        $this->load->library('encrypt');
+        $this->form_validation->set_rules('address', lang('address'), 'trim|required');
 
         if ($this->form_validation->run() == true) {
 
@@ -70,71 +57,29 @@ class system_settings extends MY_Controller
                 $lang = 'english';
             }
 
-            $tax1 = ($this->input->post('tax_rate') != 0) ? 1 : 0;
-            $tax2 = ($this->input->post('tax_rate2') != 0) ? 1 : 0;
-
-            $data = array('site_name' => DEMO ? 'Stock Manager Advance' : $this->input->post('site_name'),
+            $data = array('site_name' => $this->input->post('site_name'),
+                'language' => $lang,
+                'default_currency' => $this->input->post('currency'),
+                'default_email' =>$this->input->post('email'),
+                'mmode' => trim($this->input->post('mmode')),
+                'theme' => trim($this->input->post('theme')),
+                'rtl' => $this->input->post('rtl'),
+                'captcha' => $this->input->post('captcha'),
                 'rows_per_page' => $this->input->post('rows_per_page'),
                 'dateformat' => $this->input->post('dateformat'),
-                'timezone' => DEMO ? 'Asia/Kuala_Lumpur' : $this->input->post('timezone'),
-                'mmode' => trim($this->input->post('mmode')),
-                'iwidth' => $this->input->post('iwidth'),
-                'iheight' => $this->input->post('iheight'),
-                'twidth' => $this->input->post('twidth'),
-                'theight' => $this->input->post('theight'),
-                'watermark' => $this->input->post('watermark'),
-                'accounting_method' => $this->input->post('accounting_method'),
-                'default_email' => DEMO ? 'noreply@sma.tecdiary.my' : $this->input->post('email'),
-                'language' => $lang,
-                'theme' => trim($this->input->post('theme')),
-                'default_currency' => $this->input->post('currency'),
-                'bc_fix' => $this->input->post('bc_fix'),
-                'tax1' => $tax1,
-                'tax2' => $tax2,
-                'reference_format' => $this->input->post('reference_format'),
-                'racks' => $this->input->post('racks'),
-                'attributes' => $this->input->post('attributes'),
+                'timezone' => $this->input->post('timezone'),
                 'restrict_calendar' => $this->input->post('restrict_calendar'),
-                'captcha' => $this->input->post('captcha'),
-                'item_addition' => $this->input->post('item_addition'),
-                'protocol' => DEMO ? 'mail' : $this->input->post('protocol'),
-                'mailpath' => $this->input->post('mailpath'),
-                'smtp_host' => $this->input->post('smtp_host'),
-                'smtp_user' => $this->input->post('smtp_user'),
-                'smtp_port' => $this->input->post('smtp_port'),
-                'smtp_crypto' => $this->input->post('smtp_crypto') ? $this->input->post('smtp_crypto') : NULL,
+                'address' => $this->input->post('address'),
                 'decimals' => $this->input->post('decimals'),
                 'decimals_sep' => $this->input->post('decimals_sep'),
                 'thousands_sep' => $this->input->post('thousands_sep'),
-                'default_biller' => $this->input->post('biller'),
-                'invoice_view' => $this->input->post('invoice_view'),
-                'rtl' => $this->input->post('rtl'),
-                'each_spent' => $this->input->post('each_spent') ? $this->input->post('each_spent') : NULL,
-                'ca_point' => $this->input->post('ca_point') ? $this->input->post('ca_point') : NULL,
-                'each_sale' => $this->input->post('each_sale') ? $this->input->post('each_sale') : NULL,
-                'sa_point' => $this->input->post('sa_point') ? $this->input->post('sa_point') : NULL,
-                'sac' => $this->input->post('sac'),
-                'qty_decimals' => $this->input->post('qty_decimals'),
-                'display_all_products' => $this->input->post('display_all_products'),
-                'display_symbol' => $this->input->post('display_symbol'),
                 'symbol' => $this->input->post('symbol'),
-                'remove_expired' => $this->input->post('remove_expired'),
-                'barcode_separator' => $this->input->post('barcode_separator'),
-                'set_focus' => $this->input->post('set_focus'),
-                'disable_editing' => $this->input->post('disable_editing'),
-                'price_group' => $this->input->post('price_group'),
-                'barcode_img' => $this->input->post('barcode_renderer'),
-                'code_prefix' => $this->input->post('code_prefix'),
-                'internal_price_group' => $this->input->post('icpg'),
-                'update_cost' => $this->input->post('update_cost'),
+
             );
-            if ($this->input->post('smtp_pass')) {
-                $data['smtp_pass'] = $this->encrypt->encode($this->input->post('smtp_pass'));
-            }
         }
 
         if ($this->form_validation->run() == true && $this->settings_model->updateSetting($data)) {
-            if ( ! DEMO && TIMEZONE != $data['timezone']) {
+            if (TIMEZONE != $data['timezone']) {
                 if ( ! $this->write_index($data['timezone'])) {
                     $this->session->set_flashdata('error', lang('setting_updated_timezone_failed'));
                     redirect('system_settings');
@@ -149,7 +94,6 @@ class system_settings extends MY_Controller
             $this->data['settings'] = $this->settings_model->getSettings();
             $this->data['currencies'] = $this->settings_model->getAllCurrencies();
             $this->data['date_formats'] = $this->settings_model->getDateFormats();
-            $this->data['smtp_pass'] = $this->encrypt->decode($this->data['settings']->smtp_pass);
             $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => '#', 'page' => lang('system_settings')));
             $meta = array('page_title' => lang('system_settings'), 'bc' => $bc);
             $this->page_construct('settings/index', $meta, $this->data);

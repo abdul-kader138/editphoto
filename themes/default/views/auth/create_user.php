@@ -82,11 +82,13 @@
                         </div>
                         <div class="col-md-5 col-md-offset-1">
                             <div class="form-group">
-                                <?php echo lang('Document_Path', 'Document_Path'); ?>
-                                <div class="controls">
-                                    <input type="text" id="document_path" name="document_path" class="form-control"
-                                           required="required"/>
-                                </div>
+                                <?= lang("Country", "Country"); ?>
+                                <?php
+                                foreach ($countries as $country) {
+                                    $gp12[$country->name] = $country->name;
+                                }
+                                echo form_dropdown('country', $gp12, (isset($_POST['country']) ? $_POST['country'] : ''), 'id="country" required="required" class="form-control select" style="width:100%;"');
+                                ?>
                             </div>
                             <div class="form-group">
                                 <?= lang('status', 'status'); ?>
@@ -107,29 +109,6 @@
                                 ?>
                             </div>
 
-                            <div class="clearfix"></div>
-                            <div class="no">
-                                <div class="form-group">
-                                    <?= lang("biller", "biller"); ?>
-                                    <?php
-                                    $bl[""] = lang('select').' '.lang('biller');
-                                    foreach ($billers as $biller) {
-                                        $bl[$biller->id] = $biller->company != '-' ? $biller->company : $biller->name;
-                                    }
-                                    echo form_dropdown('biller', $bl, (isset($_POST['biller']) ? $_POST['biller'] : ''), 'id="biller" class="form-control select" style="width:100%;"');
-                                    ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= lang("warehouse", "warehouse"); ?>
-                                    <?php
-                                    $wh[''] = lang('select').' '.lang('warehouse');
-                                    foreach ($warehouses as $warehouse) {
-                                        $wh[$warehouse->id] = $warehouse->name;
-                                    }
-                                    echo form_dropdown('warehouse', $wh, (isset($_POST['warehouse']) ? $_POST['warehouse'] : ''), 'id="warehouse" class="form-control select" style="width:100%;" ');
-                                    ?>
-                                </div>
 
                                 <div class="form-group">
                                     <?= lang("view_right", "view_right"); ?>
@@ -145,11 +124,6 @@
                                     echo form_dropdown('edit_right', $opts, (isset($_POST['edit_right']) ? $_POST['edit_right'] : 0), 'id="edit_right" class="form-control select" style="width:100%;"');
                                     ?>
                                 </div>
-                                <div class="form-group">
-                                    <?= lang("allow_discount", "allow_discount"); ?>
-                                    <?= form_dropdown('allow_discount', $opts, (isset($_POST['allow_discount']) ? $_POST['allow_discount'] : 0), 'id="allow_discount" class="form-control select" style="width:100%;"'); ?>
-                                </div>
-                            </div>
 
                             <div class="row">
                                 <div class="col-md-8">
