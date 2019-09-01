@@ -94,4 +94,23 @@ class MY_Controller extends CI_Controller {
         $this->load->view($this->theme . 'footer');
     }
 
+
+    function signup_page_construct($page, $meta = array(), $data = array()) {
+        $meta['message'] = isset($data['message']) ? $data['message'] : $this->session->flashdata('message');
+        $meta['error'] = isset($data['error']) ? $data['error'] : $this->session->flashdata('error');
+        $meta['warning'] = isset($data['warning']) ? $data['warning'] : $this->session->flashdata('warning');
+        $meta['ip_address'] = $this->input->ip_address();
+        $meta['Owner'] = $data['Owner'];
+        $meta['Admin'] = $data['Admin'];
+        $meta['Settings'] = $data['Settings'];
+        $meta['dateFormats'] = $data['dateFormats'];
+        $meta['assets'] = $data['assets'];
+        $meta['GP'] = $data['GP'];
+        $this->load->view($this->theme . 'auth/header', $meta);
+        $this->load->view($this->theme . $page, $data);
+        $this->load->view($this->theme . 'auth/footer');
+    }
+
+
+
 }

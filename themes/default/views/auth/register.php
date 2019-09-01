@@ -43,8 +43,8 @@
         <div id="content" class="col-sm-12 full">
             <div class="row">
                 <div class="login-box">
-                    <div class="text-center"><?php if (LOGO) {
-                            echo '<img src="' . site_url() . 'assets/images/' . LOGO . '" alt="' . SITE_NAME . '"  />';
+                    <div class="text-center"><?php if ($LOGO) {
+                            echo '<img src="' . site_url() . 'assets/images/' . $LOGO . '" alt="' . $SITE_NAME . '"  />';
                         } ?></div>
                     <div style="clear: both; height: 20px;"></div>
                     <div class="header bblue">

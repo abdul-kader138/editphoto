@@ -209,7 +209,13 @@ class Ion_auth
                 return FALSE;
             }
 
-            $deactivate = $this->auth_model->deactivate($id);
+
+//            For Testing(a.kader)
+//            $deactivate = $this->auth_model->deactivate($id);
+            $activation_code = sha1(md5(microtime()));
+            $deactivate = $this->auth_model->activation_code_update($id,$activation_code);
+
+
 
             if (!$deactivate) {
                 $this->set_error('deactivate_unsuccessful');
@@ -217,7 +223,7 @@ class Ion_auth
                 return FALSE;
             }
 
-            $activation_code = $this->auth_model->activation_code;
+//            $activation_code = $this->auth_model->activation_code;
             $identity = $this->config->item('identity', 'ion_auth');
             $user = $this->auth_model->user($id)->row();
 

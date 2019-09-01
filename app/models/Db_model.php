@@ -14,7 +14,7 @@ class Db_model extends CI_Model
         $this->db->select('count(id) as total', FALSE)
             ->where('aprrover_id ', $id)
             ->where('approve_status ', 0);
-        $q = $this->db->get_where('approve_details',array('interface_name'=>'add_manpower_requisition'));
+        $q = $this->db->get_where('approve_details', array('interface_name' => 'add_manpower_requisition'));
         if ($q->num_rows() > 0) {
             return $q->row();
         }
@@ -26,7 +26,7 @@ class Db_model extends CI_Model
         $this->db->select('count(id) as total', FALSE)
             ->where('aprrover_id ', $id)
             ->where('approve_status ', 0);
-        $q = $this->db->get_where('approve_details',array('interface_name'=>'add_recruitment_approval'));
+        $q = $this->db->get_where('approve_details', array('interface_name' => 'add_recruitment_approval'));
         if ($q->num_rows() > 0) {
             return $q->row();
         }
@@ -39,7 +39,7 @@ class Db_model extends CI_Model
         $this->db->select('count(id) as total', FALSE)
             ->where('aprrover_id ', $id)
             ->where('approve_status ', 0);
-        $q = $this->db->get_where('approve_details_others',array('interface_name'=>'Correction Request'));
+        $q = $this->db->get_where('approve_details_others', array('interface_name' => 'Correction Request'));
         if ($q->num_rows() > 0) {
             return $q->row();
         }
@@ -51,6 +51,41 @@ class Db_model extends CI_Model
         $this->db->select('count(id) as total', FALSE);
         if (!$this->Owner && !$this->Admin) $this->db->where('users.id', $this->session->userdata('user_id'));
         $q = $this->db->get('users');
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getTotalInvoices()
+    {
+        $this->db->select('count(distinct(reference_no)) as total', FALSE);
+        if (!$this->Owner && !$this->Admin) $this->db->where('invoices.customer_id', $this->session->userdata('user_id'));
+        $q = $this->db->get('invoices');
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getTotalInvoicesPending()
+    {
+        $this->db->select('count(distinct(reference_no)) as total', FALSE);
+        $this->db->where('payment_status','Pending');
+        if (!$this->Owner && !$this->Admin) $this->db->where('invoices.customer_id', $this->session->userdata('user_id'));
+        $q = $this->db->get('invoices');
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getTotalInvoicesPaid()
+    {
+        $this->db->select('count(distinct(reference_no)) as total', FALSE);
+        $this->db->where('payment_status!=','Pending');
+        if (!$this->Owner && !$this->Admin) $this->db->where('invoices.customer_id', $this->session->userdata('user_id'));
+        $q = $this->db->get('invoices');
         if ($q->num_rows() > 0) {
             return $q->row();
         }

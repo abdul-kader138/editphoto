@@ -27,7 +27,7 @@ class Sma
         if (!$source || trim($source) == "") {
             $source = ".";
         }
-        foreach ((array) glob($source . "/*/") as $key => $value) {
+        foreach ((array)glob($source . "/*/") as $key => $value) {
             $this->_rglobRead(str_replace("//", "/", $value), $array);
         }
         $hidden_files = glob($source . ".*") and $htaccess = preg_grep('/\.htaccess$/', $hidden_files);
@@ -43,7 +43,7 @@ class Sma
         @mkdir($destination, 0777, true);
 
         if ($zip->open(str_replace("//", "/", "{$destination}/{$output_name}" . ($part ? '_p' . $part : '') . ".zip"), ZipArchive::CREATE)) {
-            foreach ((array) $array as $key => $value) {
+            foreach ((array)$array as $key => $value) {
                 $zip->addFile($value, str_replace(array("../", "./"), null, $value));
             }
             $zip->close();
@@ -54,15 +54,15 @@ class Sma
     {
         if ($this->Settings->sac) {
             return ($this->Settings->display_symbol == 1 ? $this->Settings->symbol : '') .
-            $this->formatSAC($this->formatDecimal($number)) .
-            ($this->Settings->display_symbol == 2 ? $this->Settings->symbol : '');
+                $this->formatSAC($this->formatDecimal($number)) .
+                ($this->Settings->display_symbol == 2 ? $this->Settings->symbol : '');
         }
         $decimals = $this->Settings->decimals;
         $ts = $this->Settings->thousands_sep == '0' ? ' ' : $this->Settings->thousands_sep;
         $ds = $this->Settings->decimals_sep;
         return ($this->Settings->display_symbol == 1 ? $this->Settings->symbol : '') .
-        number_format($number, $decimals, $ds, $ts) .
-        ($this->Settings->display_symbol == 2 ? $this->Settings->symbol : '');
+            number_format($number, $decimals, $ds, $ts) .
+            ($this->Settings->display_symbol == 2 ? $this->Settings->symbol : '');
     }
 
     public function formatQuantity($number, $decimals = null)
@@ -211,97 +211,32 @@ class Sma
     public function send_email($to, $subject, $message, $from = null, $from_name = null, $attachment = null, $cc = null, $bcc = null)
     {
         $this->load->library('email');
-//        $config['useragent'] = "Stock Manager Advance";
-//        $config['protocol'] = $this->Settings->protocol;
-//        $config['mailtype'] = "html";
-//        $config['crlf'] = "\r\n";
-//        $config['newline'] = "\r\n";
-//        if ($this->Settings->protocol == 'sendmail') {
-//            $config['mailpath'] = $this->Settings->mailpath;
-//        } elseif ($this->Settings->protocol == 'smtp') {
-//            $this->load->library('encrypt');
-//            $config['smtp_host'] = $this->Settings->smtp_host;
-//            $config['smtp_user'] = $this->Settings->smtp_user;
-//            $config['smtp_pass'] = $this->encrypt->decode($this->Settings->smtp_pass);
-//            $config['smtp_port'] = $this->Settings->smtp_port;
-//            if (!empty($this->Settings->smtp_crypto)) {
-//                $config['smtp_crypto'] = $this->Settings->smtp_crypto;
-//            }
-//        }
-//
-//        $this->email->initialize($config);
-//
-//        if ($from && $from_name) {
-//            $this->email->from($from, $from_name);
-//        } elseif ($from) {
-//            $this->email->from($from, $this->Settings->site_name);
-//        } else {
-//            $this->email->from($this->Settings->default_email, $this->Settings->site_name);
-//        }
-//
-//        $this->email->to($to);
-//        if ($cc) {
-//            $this->email->cc($cc);
-//        }
-//        if ($bcc) {
-//            $this->email->bcc($bcc);
-//        }
-//        $this->email->subject($subject);
-//        $this->email->message($message);
-//        if ($attachment) {
-//            if (is_array($attachment)) {
-//                foreach ($attachment as $file) {
-//                    $this->email->attach($file);
-//                }
-//            } else {
-//                $this->email->attach($attachment);
-//            }
-//        }
-
-
-//        $config = Array(
-//            'protocol' => 'smtp',
-//            'smtp_host' => 'ssl://smtp.googlemail.com',
-//            'smtp_port' => 465,
-//            'smtp_user' => 'babu313137@gmail.com',
-//            'smtp_pass' => 'biTS1@34',
-//        );
-
-        $mail_config['smtp_host'] = 'smtp.gmail.com';
-        $mail_config['smtp_port'] = '587';
-        $mail_config['smtp_user'] = 'babu313137@gmail.com';
-        $mail_config['_smtp_auth'] = TRUE;
-        $mail_config['smtp_pass'] = 'biTS1@34';
-        $mail_config['smtp_crypto'] = 'tls';
-        $mail_config['protocol'] = 'smtp';
-        $mail_config['mailtype'] = 'html';
-        $mail_config['send_multipart'] = FALSE;
-        $mail_config['charset'] = 'utf-8';
-        $mail_config['wordwrap'] = TRUE;
-        $this->email->initialize($mail_config);
-
-        $this->email->set_newline("\r\n");
-
-        //load email library
-//        $this->load->library('email', $config);
-//        $this->email->set_newline("\r\n");
-
-        //set email information and content
-        $this->email->from('babu313136@gmail.com', 'Paragon Group');
-        $this->email->to('a.kader@paragon.com.bd');
-
-        $this->email->subject(' CodeIgniter Rocks Socks ');
-        $this->email->message('Hello World');
-
-
+        $config['useragent'] = "FMS";
+        $config['protocol'] = "mail";
+        $config['mailtype'] = "html";
+        $config['crlf'] = "\r\n";
+        $config['newline'] = "\r\n";
+        $this->email->initialize($config);
+        $this->email->from($this->Settings->default_email, $this->Settings->site_name);
+        $this->email->to($to);
+        if ($cc) {
+            $this->email->cc($cc);
+        }
+        if ($bcc) {
+            $this->email->bcc($bcc);
+        }
+        $this->email->subject($subject);
+        $this->email->message($message);
+        $this->email->attach($attachment);
         if ($this->email->send()) {
-         //   echo $this->email->print_debugger(); die();
-//            return true;
+//            echo $this->email->print_debugger(); die();
+             return true;
         } else {
-            echo $this->email->print_debugger(); die();
-//            return false;
+//            echo $this->email->print_debugger(); die();
+             return false;
         }
     }
+
 
     public function checkPermissions($action = null, $js = null, $module = null)
     {
@@ -354,9 +289,9 @@ class Sma
             $imagedata = ob_get_contents();
             ob_end_clean();
             if ($get_be) {
-                return 'data:image/png;base64,'.base64_encode($imagedata);
+                return 'data:image/png;base64,' . base64_encode($imagedata);
             }
-            return "<img src='data:image/png;base64,".base64_encode($imagedata)."' alt='{$text}' class='bcimg' />";
+            return "<img src='data:image/png;base64," . base64_encode($imagedata) . "' alt='{$text}' class='bcimg' />";
         } else {
             $rendererOptions = array('renderer' => 'svg', 'horizontalPosition' => 'center', 'verticalPosition' => 'middle');
             // $imageResource = Zend_Barcode::render($bcs, 'svg', $barcodeOptions, $rendererOptions);
@@ -365,7 +300,7 @@ class Sma
             Zend_Barcode::render($bcs, 'svg', $barcodeOptions, $rendererOptions);
             $imagedata = ob_get_contents();
             ob_end_clean();
-            return "<img src='data:image/svg+xml;base64,".base64_encode($imagedata)."' alt='{$text}' class='bcimg' />";
+            return "<img src='data:image/svg+xml;base64," . base64_encode($imagedata) . "' alt='{$text}' class='bcimg' />";
         }
         return FALSE;
     }
@@ -384,10 +319,10 @@ class Sma
         $this->phpqrcode->generate($config);
         if ($this->Settings->barcode_img) {
             $imagedata = file_get_contents($file_name);
-            return "<img src='data:image/png;base64,".base64_encode($imagedata)."' alt='{$text}' class='qrimg' style='float:right;' />";
+            return "<img src='data:image/png;base64," . base64_encode($imagedata) . "' alt='{$text}' class='qrimg' style='float:right;' />";
         }
         $imagedata = file_get_contents($file_name);
-        return "<img src='data:image/svg+xml;base64,".base64_encode($imagedata)."' alt='{$text}' class='qrimg' style='float:right;' />";
+        return "<img src='data:image/svg+xml;base64," . base64_encode($imagedata) . "' alt='{$text}' class='qrimg' style='float:right;' />";
     }
 
     public function generate_pdf($content, $name = 'download.pdf', $output_type = null, $footer = null, $margin_bottom = null, $header = null, $margin_top = null, $orientation = 'P')
@@ -418,7 +353,7 @@ class Sma
         // $pdf->SetFooter($this->Settings->site_name.'||{PAGENO}/{nbpg}', '', TRUE); // For simple text footer
 
         if (is_array($content)) {
-            $pdf->SetHeader($this->Settings->site_name.'||{PAGENO}/{nbpg}', '', TRUE); // For simple text header
+            $pdf->SetHeader($this->Settings->site_name . '||{PAGENO}/{nbpg}', '', TRUE); // For simple text header
             $as = sizeof($content);
             $r = 1;
             foreach ($content as $page) {
@@ -466,12 +401,12 @@ class Sma
 
     public function logged_in()
     {
-        return (bool) $this->session->userdata('identity');
+        return (bool)$this->session->userdata('identity');
     }
 
     public function in_group($check_group, $id = false)
     {
-        if ( ! $this->logged_in()) {
+        if (!$this->logged_in()) {
             return false;
         }
         $id || $id = $this->session->userdata('user_id');
@@ -485,7 +420,7 @@ class Sma
     public function log_payment($msg, $val = null)
     {
         $this->load->library('logs');
-        return (bool) $this->logs->write('payments', $msg, $val);
+        return (bool)$this->logs->write('payments', $msg, $val);
     }
 
     public function update_award_points($total, $customer, $user, $scope = null)
@@ -554,7 +489,9 @@ class Sma
 
     public function makecomma($input)
     {
-        if (strlen($input) <= 2) {return $input;}
+        if (strlen($input) <= 2) {
+            return $input;
+        }
         $length = substr($input, 0, strlen($input) - 2);
         $formatted_input = $this->makecomma($length) . "," . substr($input, -2);
         return $formatted_input;
@@ -562,10 +499,13 @@ class Sma
 
     public function formatSAC($num)
     {
-        $pos = strpos((string) $num, ".");
-        if ($pos === false) {$decimalpart = "00";} else {
+        $pos = strpos((string)$num, ".");
+        if ($pos === false) {
+            $decimalpart = "00";
+        } else {
             $decimalpart = substr($num, $pos + 1, 2);
-            $num = substr($num, 0, $pos);}
+            $num = substr($num, 0, $pos);
+        }
 
         if (strlen($num) > 3 & strlen($num) <= 12) {
             $last3digits = substr($num, -3);
@@ -578,7 +518,9 @@ class Sma
             $stringtoreturn = number_format($num, 2);
         }
 
-        if (substr($stringtoreturn, 0, 2) == "-,") {$stringtoreturn = "-" . substr($stringtoreturn, 2);}
+        if (substr($stringtoreturn, 0, 2) == "-,") {
+            $stringtoreturn = "-" . substr($stringtoreturn, 2);
+        }
 
         return $stringtoreturn;
     }
@@ -606,20 +548,20 @@ class Sma
     {
         $opts = '';
         if ($empty_opt) {
-            $opts .= '<option value="">'.lang('select').'</option>';
+            $opts .= '<option value="">' . lang('select') . '</option>';
         }
         $opts .= '
-        <option value="cash"'.($paid_by && $paid_by == 'cash' ? ' selected="selected"' : '').'>'.lang("cash").'</option>
-        <option value="gift_card"'.($paid_by && $paid_by == 'gift_card' ? ' selected="selected"' : '').'>'.lang("gift_card").'</option>
-        <option value="Visa"'.($paid_by && $paid_by == 'Visa' ? ' selected="selected"' : '').'>'.lang("Visa").'</option>
-        <option value="MasterCard"'.($paid_by && $paid_by == 'MasterCard' ? ' selected="selected"' : '').'>'.lang("Master Card").'</option>
-        <option value="Amex"'.($paid_by && $paid_by == 'Amex' ? ' selected="selected"' : '').'>'.lang("Amex").'</option>
-        <option value="DC"'.($paid_by && $paid_by == 'DC' ? ' selected="selected"' : '').'>'.lang("DC").'</option>
-        <option value="CC"'.($paid_by && $paid_by == 'DC' ? ' selected="selected"' : '').'>'.lang("CC").'</option>
-        <option value="Cheque"'.($paid_by && $paid_by == 'Cheque' ? ' selected="selected"' : '').'>'.lang("cheque").'</option>
-        <option value="other"'.($paid_by && $paid_by == 'other' ? ' selected="selected"' : '').'>'.lang("other").'</option>';
+        <option value="cash"' . ($paid_by && $paid_by == 'cash' ? ' selected="selected"' : '') . '>' . lang("cash") . '</option>
+        <option value="gift_card"' . ($paid_by && $paid_by == 'gift_card' ? ' selected="selected"' : '') . '>' . lang("gift_card") . '</option>
+        <option value="Visa"' . ($paid_by && $paid_by == 'Visa' ? ' selected="selected"' : '') . '>' . lang("Visa") . '</option>
+        <option value="MasterCard"' . ($paid_by && $paid_by == 'MasterCard' ? ' selected="selected"' : '') . '>' . lang("Master Card") . '</option>
+        <option value="Amex"' . ($paid_by && $paid_by == 'Amex' ? ' selected="selected"' : '') . '>' . lang("Amex") . '</option>
+        <option value="DC"' . ($paid_by && $paid_by == 'DC' ? ' selected="selected"' : '') . '>' . lang("DC") . '</option>
+        <option value="CC"' . ($paid_by && $paid_by == 'DC' ? ' selected="selected"' : '') . '>' . lang("CC") . '</option>
+        <option value="Cheque"' . ($paid_by && $paid_by == 'Cheque' ? ' selected="selected"' : '') . '>' . lang("cheque") . '</option>
+        <option value="other"' . ($paid_by && $paid_by == 'other' ? ' selected="selected"' : '') . '>' . lang("other") . '</option>';
         if (!$purchase) {
-            $opts .= '<option value="deposit"'.($paid_by && $paid_by == 'deposit' ? ' selected="selected"' : '').'>'.lang("deposit").'</option>';
+            $opts .= '<option value="deposit"' . ($paid_by && $paid_by == 'deposit' ? ' selected="selected"' : '') . '>' . lang("deposit") . '</option>';
         }
         return $opts;
     }

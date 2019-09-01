@@ -45,6 +45,7 @@ $s2_file_date = $this->parser->parse_string($s2_lang_file, $s2_data, true);
 <script type="text/javascript" src="<?= $assets ?>js/jquery.calculator.min.js"></script>
 <script type="text/javascript" src="<?= $assets ?>js/core.js"></script>
 <script type="text/javascript" src="<?= $assets ?>js/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="<?= $assets ?>js/izitoast/js/iziToast.min.js"></script>
 <script type="text/javascript" charset="UTF-8">var oTable = '', r_u_sure = "<?=lang('r_u_sure')?>";
     <?=$s2_file_date?>
     $.extend(true, $.fn.dataTable.defaults, {"oLanguage":<?=$dt_lang?>});

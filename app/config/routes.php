@@ -55,6 +55,7 @@ $route['404_override'] = 'errors/error_404';
 $route['translate_uri_dashes'] = FALSE;
 
 $route['users'] = 'auth/users';
+$route['signup'] = 'auth/signup_user';
 $route['users/create_user'] = 'auth/create_user';
 $route['users/profile/(:num)'] = 'auth/profile/$1';
 $route['login'] = 'auth/login';

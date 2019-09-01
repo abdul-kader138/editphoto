@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="<?= $assets ?>images/icon.png"/>
     <link href="<?= $assets ?>styles/theme.css" rel="stylesheet"/>
     <link href="<?= $assets ?>styles/style.css" rel="stylesheet"/>
+    <link href="<?= $assets ?>js/izitoast/css/iziToast.min.css" rel="stylesheet"/>
     <script type="text/javascript" src="<?= $assets ?>js/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="<?= $assets ?>js/jquery-migrate-1.2.1.min.js"></script>
     <!--[if lt IE 9]>
@@ -167,8 +168,30 @@
                                     </li>
 
                                     <?php
-                                    if ($Owner || $Admin) {
-                                        ?>
+                                    if ($Owner || $Admin) { ?>
+
+                                        <li class="mm_invoice">
+                                            <a class="dropmenu" href="#">
+                                                <i class="fa fa-heart-o"></i>
+                                                <span class="text"> <?= lang('Invoice'); ?>
+                                                </span> <span class="chevron closed"></span>
+                                            </a>
+                                            <ul>
+                                                <li id="invoice_index">
+                                                    <a class="submenu" href="<?= site_url('invoices'); ?>">
+                                                        <i class="fa fa-heart-o"></i>
+                                                        <span class="text"> <?= lang('List_Invoice'); ?></span>
+                                                    </a>
+
+                                                </li>
+                                                <li id="invoice_add">
+                                                    <a class="submenu" href="<?= site_url('invoices/add'); ?>">
+                                                        <i class="fa fa-plus"></i>
+                                                        <span class="text"> <?= lang('Add_Invoice'); ?></span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
 
                                         <li class="mm_document">
                                             <a class="dropmenu" href="#">
@@ -249,12 +272,40 @@
 <!--                                                                    class="text"> --><?//= lang('categories'); ?><!--</span>-->
 <!--                                                        </a>-->
 <!--                                                    </li>-->
-<!--                                                    <li id="system_settings_units">-->
-<!--                                                        <a href="--><?//= site_url('system_settings/units') ?><!--">-->
-<!--                                                            <i class="fa fa-wrench"></i><span-->
-<!--                                                                    class="text"> --><?//= lang('units'); ?><!--</span>-->
-<!--                                                        </a>-->
-<!--                                                    </li>-->
+                                                    <li id="system_settings_service_type">
+                                                        <a href="<?= site_url('system_settings/service_type') ?>">
+                                                            <i class="fa fa-check-circle-o"></i><span
+                                                                    class="text"> <?= lang('Service_Type'); ?></span>
+                                                        </a>
+                                                    </li>
+
+                                                    <li id="system_settings_complexity_type">
+                                                        <a href="<?= site_url('system_settings/complexity_type') ?>">
+                                                            <i class="fa fa-check-circle-o"></i><span
+                                                                    class="text"> <?= lang('Complexity_Type'); ?></span>
+                                                        </a>
+                                                    </li>
+
+                                                    <li id="system_settings_add_ons">
+                                                        <a href="<?= site_url('system_settings/add_ons') ?>">
+                                                            <i class="fa fa-check-circle-o"></i><span
+                                                                    class="text"> <?= lang('Add_-Ons'); ?></span>
+                                                        </a>
+                                                    </li>
+
+                                                    <li id="system_settings_delivery_format">
+                                                        <a href="<?= site_url('system_settings/delivery_format') ?>">
+                                                            <i class="fa fa-check-circle-o"></i><span
+                                                                    class="text"> <?= lang('Delivery_Format'); ?></span>
+                                                        </a>
+                                                    </li>
+
+                                                    <li id="system_settings_delivery_time_cost">
+                                                        <a href="<?= site_url('system_settings/delivery_time_cost') ?>">
+                                                            <i class="fa fa-check-circle-o"></i><span
+                                                                    class="text"> <?= lang('Delivery_Time_Cost'); ?></span>
+                                                        </a>
+                                                    </li>
 <!--                                                    <li id="system_settings_brands">-->
 <!--                                                        <a href="--><?//= site_url('system_settings/brands') ?><!--">-->
 <!--                                                            <i class="fa fa-th-list"></i><span-->
@@ -344,6 +395,41 @@
                                                 </a>
                                             </li>
                                         <?php } ?>
+
+                                        <?php if ($GP['invoices-index'] || $GP['invoices-add']) { ?>
+                                            <li class="mm_invoices">
+                                                <a class="dropmenu" href="#">
+                                                    <i class="fa fa-heart-o"></i>
+                                                    <span class="text"> <?= lang('Invoices'); ?> </span>
+                                                    <span class="chevron closed"></span>
+                                                </a>
+                                                <ul>
+                                                    <?php if ($GP['invoices-index']) { ?>
+                                                        <li id="invoices_index">
+                                                            <a class="submenu"
+                                                               href="<?= site_url('invoices'); ?>">
+                                                                <i class="fa fa-users"></i><span
+                                                                        class="text"> <?= lang('List_Invoices'); ?></span>
+                                                            </a>
+                                                        </li>
+
+                                                    <?php } ?>
+
+                                                    <?php if ($GP['invoices-add']) { ?>
+                                                        <li id="invoices_add">
+                                                            <a class="submenu"
+                                                               href="<?= site_url('invoices/add'); ?>">
+                                                                <i class="fa fa-plus"></i><span
+                                                                        class="text"> <?= lang('Add_Invoices'); ?></span>
+                                                            </a>
+                                                        </li>
+
+                                                    <?php } ?>
+                                                </ul>
+                                            </li>
+                                        <?php } ?>
+
+
                                         <?php if ($GP['document-file_manager']) {
                                             ?>
                                             <li class="mm_document">

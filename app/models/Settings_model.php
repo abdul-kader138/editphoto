@@ -535,30 +535,6 @@ class Settings_model extends CI_Model
         return FALSE;
     }
 
-    public function addUnit($data)
-    {
-        if ($this->db->insert("units", $data)) {
-            return true;
-        }
-        return false;
-    }
-
-    public function updateUnit($id, $data = array())
-    {
-        if ($this->db->update("units", $data, array('id' => $id))) {
-            return true;
-        }
-        return false;
-    }
-
-    public function deleteUnit($id)
-    {
-        if ($this->db->delete("units", array('id' => $id))) {
-            $this->db->delete("units", array('base_unit' => $id));
-            return true;
-        }
-        return FALSE;
-    }
 
     public function addPriceGroup($data)
     {
@@ -1003,4 +979,124 @@ class Settings_model extends CI_Model
         }
         return false;
     }
+
+    public function addServiceType($data)
+    {
+        if ($this->db->insert("service_type", $data)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function updateServiceType($id, $data = array())
+    {
+        if ($this->db->update("service_type", $data, array('id' => $id))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function deleteServiceType($id)
+    {
+        if ($this->db->delete("service_type", array('id' => $id))) {
+            return true;
+        }
+        return FALSE;
+    }
+
+    public function addComplexityType($data)
+    {
+        if ($this->db->insert("complexity_type", $data)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function updateComplexityType($id, $data = array())
+    {
+        if ($this->db->update("complexity_type", $data, array('id' => $id))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function deleteComplexityType($id)
+    {
+        if ($this->db->delete("complexity_type", array('id' => $id))) {
+            return true;
+        }
+        return FALSE;
+    }
+    public function addAddOns($data)
+    {
+        if ($this->db->insert("add_ons", $data)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function updateAddOns($id, $data = array())
+    {
+        if ($this->db->update("add_ons", $data, array('id' => $id))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function deleteAddOns($id)
+    {
+        if ($this->db->delete("add_ons", array('id' => $id))) {
+            return true;
+        }
+        return FALSE;
+    }
+
+    public function addDeliveryFormat($data)
+    {
+        if ($this->db->insert("delivery_format", $data)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function updateDeliveryFormat($id, $data = array())
+    {
+        if ($this->db->update("delivery_format", $data, array('id' => $id))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function deleteDeliveryFormat($id)
+    {
+        if ($this->db->delete("delivery_format", array('id' => $id))) {
+            return true;
+        }
+        return FALSE;
+    }
+
+    public function addDeliveryTimeCost($data)
+    {
+        if ($this->db->insert("delivery_time_cost", $data)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function editDeliveryTimeCost($id, $data = array())
+    {
+        if ($this->db->update("delivery_time_cost", $data, array('id' => $id))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function deleteDeliveryTimeCost($id)
+    {
+        if ($this->db->delete("delivery_time_cost", array('id' => $id))) {
+            return true;
+        }
+        return FALSE;
+    }
+
 }

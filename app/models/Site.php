@@ -3,13 +3,14 @@
 class Site extends CI_Model
 {
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
 
-
-    public function get_setting() {
+    public function get_setting()
+    {
         $q = $this->db->get('settings');
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -17,7 +18,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getDateFormat($id) {
+    public function getDateFormat($id)
+    {
         $q = $this->db->get_where('date_format', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -25,7 +27,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getAllCompanies($group_name) {
+    public function getAllCompanies($group_name)
+    {
         $q = $this->db->get_where('companies', array('group_name' => $group_name));
         if ($q->num_rows() > 0) {
             foreach (($q->result()) as $row) {
@@ -36,7 +39,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getCompanyByID($id) {
+    public function getCompanyByID($id)
+    {
         $q = $this->db->get_where('companies', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -44,7 +48,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getCustomerGroupByID($id) {
+    public function getCustomerGroupByID($id)
+    {
         $q = $this->db->get_where('customer_groups', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -52,7 +57,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getUser($id = NULL) {
+    public function getUser($id = NULL)
+    {
         if (!$id) {
             $id = $this->session->userdata('user_id');
         }
@@ -64,7 +70,8 @@ class Site extends CI_Model
     }
 
 
-    public function getAllCurrencies() {
+    public function getAllCurrencies()
+    {
         $q = $this->db->get('currencies');
         if ($q->num_rows() > 0) {
             foreach (($q->result()) as $row) {
@@ -75,7 +82,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getCurrencyByCode($code) {
+    public function getCurrencyByCode($code)
+    {
         $q = $this->db->get_where('currencies', array('code' => $code), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -83,7 +91,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getAllTaxRates() {
+    public function getAllTaxRates()
+    {
         $q = $this->db->get('tax_rates');
         if ($q->num_rows() > 0) {
             foreach (($q->result()) as $row) {
@@ -94,7 +103,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getTaxRateByID($id) {
+    public function getTaxRateByID($id)
+    {
         $q = $this->db->get_where('tax_rates', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -103,8 +113,8 @@ class Site extends CI_Model
     }
 
 
-
-    public function getAllCategories() {
+    public function getAllCategories()
+    {
         $this->db->where('parent_id', NULL)->or_where('parent_id', 0)->order_by('name');
         $q = $this->db->get("categories");
         if ($q->num_rows() > 0) {
@@ -116,7 +126,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getSubCategories($parent_id) {
+    public function getSubCategories($parent_id)
+    {
         $this->db->where('parent_id', $parent_id)->order_by('name');
         $q = $this->db->get("categories");
         if ($q->num_rows() > 0) {
@@ -128,7 +139,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getCategoryByID($id) {
+    public function getCategoryByID($id)
+    {
         $q = $this->db->get_where('categories', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -137,13 +149,13 @@ class Site extends CI_Model
     }
 
 
-
-
-    public function modal_js() {
+    public function modal_js()
+    {
         return '<script type="text/javascript">' . file_get_contents($this->data['assets'] . 'js/modal.js') . '</script>';
     }
 
-    public function getReference($field) {
+    public function getReference($field)
+    {
         $q = $this->db->get_where('order_ref', array('ref_id' => '1'), 1);
         if ($q->num_rows() > 0) {
             $ref = $q->row();
@@ -205,7 +217,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getRandomReference($len = 12) {
+    public function getRandomReference($len = 12)
+    {
         $result = '';
         for ($i = 0; $i < $len; $i++) {
             $result .= mt_rand(0, 9);
@@ -218,7 +231,8 @@ class Site extends CI_Model
         return $result;
     }
 
-    public function getSaleByReference($ref) {
+    public function getSaleByReference($ref)
+    {
         $this->db->like('reference_no', $ref, 'before');
         $q = $this->db->get('sales', 1);
         if ($q->num_rows() > 0) {
@@ -227,7 +241,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function updateReference($field) {
+    public function updateReference($field)
+    {
         $q = $this->db->get_where('order_ref', array('ref_id' => '1'), 1);
         if ($q->num_rows() > 0) {
             $ref = $q->row();
@@ -237,7 +252,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function checkPermissions() {
+    public function checkPermissions()
+    {
         $q = $this->db->get_where('permissions', array('group_id' => $this->session->userdata('group_id')), 1);
         if ($q->num_rows() > 0) {
             return $q->result_array();
@@ -245,7 +261,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getNotifications() {
+    public function getNotifications()
+    {
         $date = date('Y-m-d H:i:s', time());
         $this->db->where("from_date <=", $date);
         $this->db->where("till_date >=", $date);
@@ -267,7 +284,8 @@ class Site extends CI_Model
         }
     }
 
-    public function getUpcomingEvents() {
+    public function getUpcomingEvents()
+    {
         $dt = date('Y-m-d');
         $this->db->where('start >=', $dt)->order_by('start')->limit(5);
         if ($this->Settings->restrict_calendar) {
@@ -285,7 +303,8 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getUserGroup($user_id = false) {
+    public function getUserGroup($user_id = false)
+    {
         if (!$user_id) {
             $user_id = $this->session->userdata('user_id');
         }
@@ -297,11 +316,11 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getUserGroupID($user_id = false) {
+    public function getUserGroupID($user_id = false)
+    {
         $user = $this->getUser($user_id);
         return $user->group_id;
     }
-
 
 
     public function getAllBrands()
@@ -327,7 +346,7 @@ class Site extends CI_Model
 
     public function convertToBase($unit, $value)
     {
-        switch($unit->operator) {
+        switch ($unit->operator) {
             case '*':
                 return $value / $unit->operation_value;
                 break;
@@ -344,7 +363,6 @@ class Site extends CI_Model
                 return $value;
         }
     }
-    
 
 
     public function getAllCompany()
@@ -383,7 +401,7 @@ class Site extends CI_Model
     public function getAllUserById($id)
     {
         $q = $this->db->get("users");
-        $this->db->where('id',3);
+        $this->db->where('id', 3);
         if ($q->num_rows() > 0) {
             foreach (($q->result()) as $row) {
                 $data[] = $row;
@@ -404,9 +422,9 @@ class Site extends CI_Model
     }
 
 
-    public function getApproverListByCategory($name,$category_id)
+    public function getApproverListByCategory($name, $category_id)
     {
-        $q = $this->db->get_where('approver_list', array('interface_name' => $name,'category_id'=>$category_id,'approver_seq'=>1), 1);
+        $q = $this->db->get_where('approver_list', array('interface_name' => $name, 'category_id' => $category_id, 'approver_seq' => 1), 1);
         $this->db->order_by('approver_seq', 'asc');
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -498,9 +516,9 @@ class Site extends CI_Model
     }
 
 
-    public function getApproverOthersList($name,$category_id,$company_id,$type)
+    public function getApproverOthersList($name, $category_id, $company_id, $type)
     {
-        $q = $this->db->get_where('approver_list_other', array('interface_name' => $name,'category_id'=>$category_id,'company_id'=>$company_id,'type'=>$type,'approver_seq'=>1), 1);
+        $q = $this->db->get_where('approver_list_other', array('interface_name' => $name, 'category_id' => $category_id, 'company_id' => $company_id, 'type' => $type, 'approver_seq' => 1), 1);
         $this->db->order_by('approver_seq', 'asc');
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -522,5 +540,76 @@ class Site extends CI_Model
     }
 
 
+    public function getServiceTypeByID($id=null)
+    {
+        $q = $this->db->get_where('service_type', array('id' => $id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+
+    public function getComplexityTypeByID($id=null)
+    {
+        $q = $this->db->get_where('complexity_type', array('id' => $id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getAddOnsByID($id=null)
+    {
+        $q = $this->db->get_where('add_ons', array('id' => $id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+
+    public function getDeliveryFormatByID($id=null)
+    {
+        $q = $this->db->get_where('delivery_format', array('id' => $id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getDeliveryTimeCostByID($id=null)
+    {
+        $q = $this->db->get_where('delivery_time_cost', array('id' => $id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+
+    public function getUsersByID($id)
+    {
+        $q = $this->db->get_where('users', array('id' => $id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getAllUsersById()
+    {
+
+
+        if (!$this->Owner && !$this->Admin)  $this->db->where('id',$this->session->userdata('user_id'));
+        $q = $this->db->get("users");
+        if ($q->num_rows() > 0) {
+            foreach (($q->result()) as $row) {
+                $data[] = $row;
+            }
+            return $data;
+        }
+        return FALSE;
+    }
 
 }

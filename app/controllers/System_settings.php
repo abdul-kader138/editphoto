@@ -4,6 +4,7 @@ class system_settings extends MY_Controller
 {
 
     private $permission_details;
+
     function __construct()
     {
         parent::__construct();
@@ -49,7 +50,7 @@ class system_settings extends MY_Controller
 
             $language = $this->input->post('language');
 
-            if ((file_exists(APPPATH.'language'.DIRECTORY_SEPARATOR.$language.DIRECTORY_SEPARATOR.'sma_lang.php') && is_dir(APPPATH.DIRECTORY_SEPARATOR.'language'.DIRECTORY_SEPARATOR.$language)) || $language == 'english') {
+            if ((file_exists(APPPATH . 'language' . DIRECTORY_SEPARATOR . $language . DIRECTORY_SEPARATOR . 'sma_lang.php') && is_dir(APPPATH . DIRECTORY_SEPARATOR . 'language' . DIRECTORY_SEPARATOR . $language)) || $language == 'english') {
                 $lang = $language;
             } else {
                 $this->session->set_flashdata('error', lang('language_x_found'));
@@ -60,7 +61,7 @@ class system_settings extends MY_Controller
             $data = array('site_name' => $this->input->post('site_name'),
                 'language' => $lang,
                 'default_currency' => $this->input->post('currency'),
-                'default_email' =>$this->input->post('email'),
+                'default_email' => $this->input->post('email'),
                 'mmode' => trim($this->input->post('mmode')),
                 'theme' => trim($this->input->post('theme')),
                 'rtl' => $this->input->post('rtl'),
@@ -74,13 +75,14 @@ class system_settings extends MY_Controller
                 'decimals_sep' => $this->input->post('decimals_sep'),
                 'thousands_sep' => $this->input->post('thousands_sep'),
                 'symbol' => $this->input->post('symbol'),
+                'tax' => $this->input->post('tax'),
 
             );
         }
 
         if ($this->form_validation->run() == true && $this->settings_model->updateSetting($data)) {
             if (TIMEZONE != $data['timezone']) {
-                if ( ! $this->write_index($data['timezone'])) {
+                if (!$this->write_index($data['timezone'])) {
                     $this->session->set_flashdata('error', lang('setting_updated_timezone_failed'));
                     redirect('system_settings');
                 }
@@ -321,7 +323,7 @@ class system_settings extends MY_Controller
             $fields = array('version' => $this->Settings->version, 'code' => $this->Settings->purchase_code, 'username' => $this->Settings->envato_username, 'site' => base_url());
             $this->load->helper('update');
             $protocol = is_https() ? 'https://' : 'http://';
-            $updates = get_remote_contents($protocol.'api.tecdiary.com/v1/update/', $fields);
+            $updates = get_remote_contents($protocol . 'api.tecdiary.com/v1/update/', $fields);
             $this->data['updates'] = json_decode($updates);
             $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => '#', 'page' => lang('updates')));
             $meta = array('page_title' => lang('updates'), 'bc' => $bc);
@@ -378,7 +380,8 @@ class system_settings extends MY_Controller
 
         $this->data['files'] = glob('./files/backups/*.zip', GLOB_BRACE);
         $this->data['dbs'] = glob('./files/backups/*.txt', GLOB_BRACE);
-        krsort($this->data['files']); krsort($this->data['dbs']);
+        krsort($this->data['files']);
+        krsort($this->data['dbs']);
         $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => '#', 'page' => lang('backups')));
         $meta = array('page_title' => lang('backups'), 'bc' => $bc);
         $this->page_construct('settings/backups', $meta, $this->data);
@@ -776,6 +779,10 @@ class system_settings extends MY_Controller
                 'calendar-edit' => $this->input->post('calendar-edit'),
                 'calendar-delete' => $this->input->post('calendar-delete'),
 
+                'invoices-index' => $this->input->post('invoices-index'),
+                'invoices-add' => $this->input->post('invoices-add'),
+                'invoices-delete' => $this->input->post('invoices-delete'),
+
 
                 // a.KADER
                 'document-file_manager' => $this->input->post('document-file_manager'),
@@ -1066,8 +1073,8 @@ class system_settings extends MY_Controller
     function categories()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['category-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -1083,8 +1090,8 @@ class system_settings extends MY_Controller
     function getCategories()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['category-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -1092,11 +1099,11 @@ class system_settings extends MY_Controller
         }
 
         //        build  anchor
-        $edit_link='';
+        $edit_link = '';
         if ($this->Owner || $this->Admin || $get_permission['category-edit'])
-            $edit_link= '&nbsp<a href="' . site_url("system_settings/edit_category/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("edit_category") . '"><i class="fa fa-edit"></i></a>';
+            $edit_link = '&nbsp<a href="' . site_url("system_settings/edit_category/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("edit_category") . '"><i class="fa fa-edit"></i></a>';
 
-        $delete_link='';
+        $delete_link = '';
         if ($this->Owner || $this->Admin || $get_permission['category-delete'])
 
             $delete_link = "&nbsp<a href='#' class='po' title='<b>" . lang("delete_category") . "</b>' data-content=\"<p>"
@@ -1104,7 +1111,7 @@ class system_settings extends MY_Controller
                 . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i> </a>";
 //
 
-        $print_barcode = anchor('products/print_barcodes/?category=$1', '<i class="fa fa-print"></i>', 'title="'.lang('print_barcodes').'" class="tip"');
+        $print_barcode = anchor('products/print_barcodes/?category=$1', '<i class="fa fa-print"></i>', 'title="' . lang('print_barcodes') . '" class="tip"');
 
         $this->load->library('datatables');
         $this->datatables
@@ -1112,7 +1119,7 @@ class system_settings extends MY_Controller
             ->from("categories")
             ->join("categories c", 'c.id=categories.parent_id', 'left')
             ->group_by('categories.id')
-            ->add_column("Actions", "<div class=\"text-center\">".$print_barcode.$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class=\"text-center\">" . $print_barcode . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
@@ -1120,8 +1127,8 @@ class system_settings extends MY_Controller
     function add_category()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['category-add'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -1140,7 +1147,7 @@ class system_settings extends MY_Controller
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
                 'parent_id' => $this->input->post('parent'),
-                );
+            );
 
             if ($_FILES['userfile']['size'] > 0) {
                 $this->load->library('upload');
@@ -1213,8 +1220,8 @@ class system_settings extends MY_Controller
     function edit_category($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['category-edit'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -1237,7 +1244,7 @@ class system_settings extends MY_Controller
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
                 'parent_id' => $this->input->post('parent'),
-                );
+            );
 
             if ($_FILES['userfile']['size'] > 0) {
                 $this->load->library('upload');
@@ -1311,8 +1318,8 @@ class system_settings extends MY_Controller
     function delete_category($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['category-delete'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -1340,8 +1347,8 @@ class system_settings extends MY_Controller
 
             if (!empty($_POST['val'])) {
                 if ($this->input->post('form_action') == 'delete') {
-                    if(! $this->Owner && ! $this->Admin) {
-                        $get_permission=$this->permission_details[0];
+                    if (!$this->Owner && !$this->Admin) {
+                        $get_permission = $this->permission_details[0];
                         if ((!$get_permission['category-delete'])) {
                             $this->session->set_flashdata('warning', lang('access_denied'));
                             redirect($_SERVER["HTTP_REFERER"]);
@@ -2472,7 +2479,7 @@ class system_settings extends MY_Controller
                 }
 
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getCategoryByCode(trim($csv_ct['code']))) {
+                    if (!$this->settings_model->getCategoryByCode(trim($csv_ct['code']))) {
                         $pcat = NULL;
                         $pcode = trim($csv_ct['pcode']);
                         if (!empty($pcode)) {
@@ -2482,14 +2489,14 @@ class system_settings extends MY_Controller
                                     'name' => trim($csv_ct['name']),
                                     'image' => trim($csv_ct['image']),
                                     'parent_id' => $pcategory->id,
-                                    );
+                                );
                             }
                         } else {
                             $data[] = array(
                                 'code' => trim($csv_ct['code']),
                                 'name' => trim($csv_ct['name']),
                                 'image' => trim($csv_ct['image']),
-                                );
+                            );
                         }
                     }
                 }
@@ -2510,7 +2517,7 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_categories', $this->data);
+            $this->load->view($this->theme . 'settings/import_categories', $this->data);
 
         }
     }
@@ -2563,14 +2570,14 @@ class system_settings extends MY_Controller
 
                 $rw = 2;
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getSubcategoryByCode(trim($csv_ct['code']))) {
+                    if (!$this->settings_model->getSubcategoryByCode(trim($csv_ct['code']))) {
                         if ($parent_actegory = $this->settings_model->getCategoryByCode(trim($csv_ct['category_code']))) {
                             $data[] = array(
                                 'code' => trim($csv_ct['code']),
                                 'name' => trim($csv_ct['name']),
                                 'image' => trim($csv_ct['image']),
                                 'category_id' => $parent_actegory->id,
-                                );
+                            );
                         } else {
                             $this->session->set_flashdata('error', lang("check_category_code") . " (" . $csv_ct['category_code'] . "). " . lang("category_code_x_exist") . " " . lang("line_no") . " " . $rw);
                             redirect("system_settings/categories");
@@ -2595,7 +2602,7 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_subcategories', $this->data);
+            $this->load->view($this->theme . 'settings/import_subcategories', $this->data);
 
         }
     }
@@ -2647,11 +2654,11 @@ class system_settings extends MY_Controller
                 }
 
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getExpenseCategoryByCode(trim($csv_ct['code']))) {
+                    if (!$this->settings_model->getExpenseCategoryByCode(trim($csv_ct['code']))) {
                         $data[] = array(
                             'code' => trim($csv_ct['code']),
                             'name' => trim($csv_ct['name']),
-                            );
+                        );
                     }
                 }
             }
@@ -2671,12 +2678,12 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_expense_categories', $this->data);
+            $this->load->view($this->theme . 'settings/import_expense_categories', $this->data);
 
         }
     }
 
-    function units()
+    function service_type()
     {
 
         if (!$this->Owner) {
@@ -2686,12 +2693,12 @@ class system_settings extends MY_Controller
 
         $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
 
-        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')), array('link' => '#', 'page' => lang('units')));
-        $meta = array('page_title' => lang('units'), 'bc' => $bc);
-        $this->page_construct('settings/units', $meta, $this->data);
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')), array('link' => '#', 'page' => lang('Service Type')));
+        $meta = array('page_title' => lang('Service_Type'), 'bc' => $bc);
+        $this->page_construct('settings/serviceType', $meta, $this->data);
     }
 
-    function getUnits()
+    function get_service_type()
     {
         if (!$this->Owner) {
             $this->session->set_flashdata('warning', lang('access_denied'));
@@ -2701,16 +2708,15 @@ class system_settings extends MY_Controller
 
         $this->load->library('datatables');
         $this->datatables
-            ->select("{$this->db->dbprefix('units')}.id as id, {$this->db->dbprefix('units')}.code, {$this->db->dbprefix('units')}.name, b.name as base_unit, {$this->db->dbprefix('units')}.operator, {$this->db->dbprefix('units')}.operation_value", FALSE)
-            ->from("units")
-            ->join("units b", 'b.id=units.base_unit', 'left')
-            ->group_by('units.id')
-            ->add_column("Actions", "<div class=\"text-center\"><a href='" . site_url('system_settings/edit_unit/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='" . lang("edit_unit") . "'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("delete_unit") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/delete_unit/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
+            ->select("{$this->db->dbprefix('service_type')}.id as id, {$this->db->dbprefix('service_type')}.code, {$this->db->dbprefix('service_type')}.name, {$this->db->dbprefix('service_type')}.description", FALSE)
+            ->from("service_type")
+            ->group_by('service_type.id')
+            ->add_column("Actions", "<div class=\"text-center\"><a href='" . site_url('system_settings/editServiceType/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='" . lang("Edit_Service_Type") . "'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("Delete") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/deleteServiceType/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
 
         echo $this->datatables->generate();
     }
 
-    function add_unit()
+    function addServiceType()
     {
 
         if (!$this->Owner) {
@@ -2718,42 +2724,37 @@ class system_settings extends MY_Controller
             redirect('welcome');
         }
 
-        $this->form_validation->set_rules('code', lang("unit_code"), 'trim|is_unique[units.code]|required');
-        $this->form_validation->set_rules('name', lang("unit_name"), 'trim|required');
-        if ($this->input->post('base_unit')) {
-            $this->form_validation->set_rules('operator', lang("operator"), 'required');
-            $this->form_validation->set_rules('operation_value', lang("operation_value"), 'trim|required');
-        }
+        $this->form_validation->set_rules('code', lang("Code"), 'trim|is_unique[service_type.code]|required');
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required|is_unique[service_type.name]');
 
         if ($this->form_validation->run() == true) {
 
             $data = array(
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
-                'base_unit' => $this->input->post('base_unit') ? $this->input->post('base_unit') : NULL,
-                'operator' => $this->input->post('base_unit') ? $this->input->post('operator') : NULL,
-                'operation_value' => $this->input->post('operation_value') ? $this->input->post('operation_value') : NULL,
-                );
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'created_by' => $this->session->userdata('user_id'),
+                'created_date' => date("Y-m-d H:i:s")
+            );
 
-        } elseif ($this->input->post('add_unit')) {
+        } elseif ($this->input->post('add_service_type')) {
             $this->session->set_flashdata('error', validation_errors());
-            redirect("system_settings/units");
+            redirect("system_settings/service_type");
         }
 
-        if ($this->form_validation->run() == true && $this->settings_model->addUnit($data)) {
-            $this->session->set_flashdata('message', lang("unit_added"));
-            redirect("system_settings/units");
+        if ($this->form_validation->run() == true && $this->settings_model->addServiceType($data)) {
+            $this->session->set_flashdata('message', lang("Info_added_successfully."));
+            redirect("system_settings/service_type");
         } else {
 
             $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
-            $this->data['base_units'] = $this->site->getAllBaseUnits();
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme . 'settings/add_unit', $this->data);
+            $this->load->view($this->theme . 'settings/addServiceType', $this->data);
 
         }
     }
 
-    function edit_unit($id = NULL)
+    function editServiceType($id = NULL)
     {
         if (!$this->Owner) {
             $this->session->set_flashdata('warning', lang('access_denied'));
@@ -2762,14 +2763,13 @@ class system_settings extends MY_Controller
 
 
         $this->form_validation->set_rules('code', lang("code"), 'trim|required');
-        $unit_details = $this->site->getUnitByID($id);
-        if ($this->input->post('code') != $unit_details->code) {
-            $this->form_validation->set_rules('code', lang("code"), 'is_unique[units.code]');
+        $sd_details = $this->site->getServiceTypeByID($id);
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('code', lang("Code"), 'is_unique[service_type.code]');
         }
-        $this->form_validation->set_rules('name', lang("name"), 'trim|required');
-        if ($this->input->post('base_unit')) {
-            $this->form_validation->set_rules('operator', lang("operator"), 'required');
-            $this->form_validation->set_rules('operation_value', lang("operation_value"), 'trim|required');
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required');
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('name', lang("Name"), 'is_unique[service_type.name]');
         }
 
         if ($this->form_validation->run() == true) {
@@ -2777,31 +2777,30 @@ class system_settings extends MY_Controller
             $data = array(
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
-                'base_unit' => $this->input->post('base_unit') ? $this->input->post('base_unit') : NULL,
-                'operator' => $this->input->post('base_unit') ? $this->input->post('operator') : NULL,
-                'operation_value' => $this->input->post('operation_value') ? $this->input->post('operation_value') : NULL,
-                );
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'updated_by' => $this->session->userdata('user_id'),
+                'updated_date' => date("Y-m-d H:i:s")
+            );
 
-        } elseif ($this->input->post('edit_unit')) {
+        } elseif ($this->input->post('edit_service_type')) {
             $this->session->set_flashdata('error', validation_errors());
-            redirect("system_settings/units");
+            redirect("system_settings/service_type");
         }
 
-        if ($this->form_validation->run() == true && $this->settings_model->updateUnit($id, $data)) {
-            $this->session->set_flashdata('message', lang("unit_updated"));
-            redirect("system_settings/units");
+        if ($this->form_validation->run() == true && $this->settings_model->updateServiceType($id, $data)) {
+            $this->session->set_flashdata('message', lang("Info_updated_successfully"));
+            redirect("system_settings/service_type");
         } else {
 
             $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->data['unit'] = $unit_details;
-            $this->data['base_units'] = $this->site->getAllBaseUnits();
-            $this->load->view($this->theme . 'settings/edit_unit', $this->data);
+            $this->data['sd_detail'] = $sd_details;
+            $this->load->view($this->theme . 'settings/editServiceType', $this->data);
 
         }
     }
 
-    function delete_unit($id = NULL)
+    function deleteServiceType($id = NULL)
     {
 
         if (!$this->Owner) {
@@ -2809,17 +2808,17 @@ class system_settings extends MY_Controller
             redirect('welcome');
         }
 
-        if ($this->site->getUnitsByBUID($id)) {
-            $this->session->set_flashdata('error', lang("unit_has_subunit"));
-            redirect("system_settings/units");
+        if (!$this->site->getServiceTypeByID($id)) {
+            $this->session->set_flashdata('error', lang("Operation_Failed"));
+            redirect("system_settings/service_type");
         }
 
-        if ($this->settings_model->deleteUnit($id)) {
-            echo lang("unit_deleted");
+        if ($this->settings_model->deleteServiceType($id)) {
+            echo lang("Info_deleted_successfully");
         }
     }
 
-    function unit_actions()
+    function serviceType_actions()
     {
 
         if (!$this->Owner) {
@@ -2834,70 +2833,13 @@ class system_settings extends MY_Controller
             if (!empty($_POST['val'])) {
                 if ($this->input->post('form_action') == 'delete') {
                     foreach ($_POST['val'] as $id) {
-                        $this->settings_model->deleteUnit($id);
+                        $this->settings_model->deleteServiceType($id);
                     }
-                    $this->session->set_flashdata('message', lang("units_deleted"));
-                    redirect($_SERVER["HTTP_REFERER"]);
-                }
-
-                if ($this->input->post('form_action') == 'export_excel' || $this->input->post('form_action') == 'export_pdf') {
-
-                    $this->load->library('excel');
-                    $this->excel->setActiveSheetIndex(0);
-                    $this->excel->getActiveSheet()->setTitle(lang('categories'));
-                    $this->excel->getActiveSheet()->SetCellValue('A1', lang('code'));
-                    $this->excel->getActiveSheet()->SetCellValue('B1', lang('name'));
-                    $this->excel->getActiveSheet()->SetCellValue('C1', lang('base_unit'));
-                    $this->excel->getActiveSheet()->SetCellValue('D1', lang('operator'));
-                    $this->excel->getActiveSheet()->SetCellValue('E1', lang('operation_value'));
-
-                    $row = 2;
-                    foreach ($_POST['val'] as $id) {
-                        $unit = $this->site->getUnitByID($id);
-                        $this->excel->getActiveSheet()->SetCellValue('A' . $row, $unit->code);
-                        $this->excel->getActiveSheet()->SetCellValue('B' . $row, $unit->name);
-                        $this->excel->getActiveSheet()->SetCellValue('C' . $row, $unit->base_unit);
-                        $this->excel->getActiveSheet()->SetCellValue('D' . $row, $unit->operator);
-                        $this->excel->getActiveSheet()->SetCellValue('E' . $row, $unit->operation_value);
-                        $row++;
-                    }
-
-                    $this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
-                    $this->excel->getDefaultStyle()->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-                    $filename = 'categories_' . date('Y_m_d_H_i_s');
-                    if ($this->input->post('form_action') == 'export_pdf') {
-                        $styleArray = array('borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)));
-                        $this->excel->getDefaultStyle()->applyFromArray($styleArray);
-                        $this->excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-                        require_once(APPPATH . "third_party" . DIRECTORY_SEPARATOR . "MPDF" . DIRECTORY_SEPARATOR . "mpdf.php");
-                        $rendererName = PHPExcel_Settings::PDF_RENDERER_MPDF;
-                        $rendererLibrary = 'MPDF';
-                        $rendererLibraryPath = APPPATH . 'third_party' . DIRECTORY_SEPARATOR . $rendererLibrary;
-                        if (!PHPExcel_Settings::setPdfRenderer($rendererName, $rendererLibraryPath)) {
-                            die('Please set the $rendererName: ' . $rendererName . ' and $rendererLibraryPath: ' . $rendererLibraryPath . ' values' .
-                                PHP_EOL . ' as appropriate for your directory structure');
-                        }
-
-                        header('Content-Type: application/pdf');
-                        header('Content-Disposition: attachment;filename="' . $filename . '.pdf"');
-                        header('Cache-Control: max-age=0');
-
-                        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'PDF');
-                        return $objWriter->save('php://output');
-                    }
-                    if ($this->input->post('form_action') == 'export_excel') {
-                        header('Content-Type: application/vnd.ms-excel');
-                        header('Content-Disposition: attachment;filename="' . $filename . '.xls"');
-                        header('Cache-Control: max-age=0');
-
-                        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');
-                        return $objWriter->save('php://output');
-                    }
-
+                    $this->session->set_flashdata('message', lang("Info_deleted_successfully"));
                     redirect($_SERVER["HTTP_REFERER"]);
                 }
             } else {
-                $this->session->set_flashdata('error', lang("no_record_selected"));
+                $this->session->set_flashdata('error', lang("No_Record_Selected"));
                 redirect($_SERVER["HTTP_REFERER"]);
             }
         } else {
@@ -2905,6 +2847,678 @@ class system_settings extends MY_Controller
             redirect($_SERVER["HTTP_REFERER"]);
         }
     }
+
+
+    function complexity_type()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')), array('link' => '#', 'page' => lang('Complexity_Type')));
+        $meta = array('page_title' => lang('Complexity_Type'), 'bc' => $bc);
+        $this->page_construct('settings/complexityType', $meta, $this->data);
+    }
+
+    function get_complexity()
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->load->library('datatables');
+        $this->datatables
+            ->select("{$this->db->dbprefix('complexity_type')}.id as id, {$this->db->dbprefix('complexity_type')}.code, {$this->db->dbprefix('complexity_type')}.name, {$this->db->dbprefix('complexity_type')}.price,{$this->db->dbprefix('complexity_type')}.description", FALSE)
+            ->from("complexity_type")
+            ->group_by('complexity_type.id')
+            ->add_column("Actions", "<div class=\"text-center\"><a href='" . site_url('system_settings/editComplexityType/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='" . lang("Edit_Complexity_Type") . "'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("Delete") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/deleteComplexityType/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
+
+        echo $this->datatables->generate();
+    }
+
+    function addComplexityType()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('code', lang("Code"), 'trim|is_unique[complexity_type.code]|required');
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required|is_unique[complexity_type.name]');
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'price' => $this->input->post('price'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'created_by' => $this->session->userdata('user_id'),
+                'created_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('add_complexity_type')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/complexity_type");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->addComplexityType($data)) {
+            $this->session->set_flashdata('message', lang("Info_added_successfully."));
+            redirect("system_settings/complexity_type");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->load->view($this->theme . 'settings/addComplexityType', $this->data);
+
+        }
+    }
+
+    function editComplexityType($id = NULL)
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->form_validation->set_rules('code', lang("code"), 'trim|required');
+        $sd_details = $this->site->getComplexityTypeByID($id);
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('code', lang("Code"), 'is_unique[complexity_type.code]');
+        }
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required');
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('name', lang("Name"), 'is_unique[complexity_type.name]');
+        }
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'price' => $this->input->post('price'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'updated_by' => $this->session->userdata('user_id'),
+                'updated_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('edit_complexity_type')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/complexity_type");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->updateComplexityType($id, $data)) {
+            $this->session->set_flashdata('message', lang("Info_updated_successfully"));
+            redirect("system_settings/complexity_type");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->data['sd_detail'] = $sd_details;
+            $this->load->view($this->theme . 'settings/editComplexityType', $this->data);
+
+        }
+    }
+
+    function deleteComplexityType($id = NULL)
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        if (!$this->site->getComplexityTypeByID($id)) {
+            $this->session->set_flashdata('error', lang("Operation_Failed"));
+            redirect("system_settings/complexityType");
+        }
+
+        if ($this->settings_model->deleteComplexityType($id)) {
+            echo lang("Info_deleted_successfully");
+        }
+    }
+
+    function complexityType_actions()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('form_action', lang("form_action"), 'required');
+
+        if ($this->form_validation->run() == true) {
+
+            if (!empty($_POST['val'])) {
+                if ($this->input->post('form_action') == 'delete') {
+                    foreach ($_POST['val'] as $id) {
+                        $this->settings_model->deleteComplexityType($id);
+                    }
+                    $this->session->set_flashdata('message', lang("Info_deleted_successfully"));
+                    redirect($_SERVER["HTTP_REFERER"]);
+                }
+            } else {
+                $this->session->set_flashdata('error', lang("No_Record_Selected"));
+                redirect($_SERVER["HTTP_REFERER"]);
+            }
+        } else {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+
+
+    function add_ons()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')), array('link' => '#', 'page' => lang('Add_-Ons')));
+        $meta = array('page_title' => lang('Add_-Ons'), 'bc' => $bc);
+        $this->page_construct('settings/add_ons', $meta, $this->data);
+    }
+
+    function get_add_ons()
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->load->library('datatables');
+        $this->datatables
+            ->select("{$this->db->dbprefix('add_ons')}.id as id, {$this->db->dbprefix('add_ons')}.code, {$this->db->dbprefix('add_ons')}.name, {$this->db->dbprefix('add_ons')}.price,{$this->db->dbprefix('add_ons')}.description", FALSE)
+            ->from("add_ons")
+            ->group_by('add_ons.id')
+            ->add_column("Actions", "<div class=\"text-center\"><a href='" . site_url('system_settings/editAddOns/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='" . lang("Edit_Add_-Ons") . "'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("Delete") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/deleteAddOns/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
+
+        echo $this->datatables->generate();
+    }
+
+    function addAddOns()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('code', lang("Code"), 'trim|is_unique[add_ons.code]|required');
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required|is_unique[add_ons.name]');
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'price' => $this->input->post('price'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'created_by' => $this->session->userdata('user_id'),
+                'created_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('add_add_ons')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/add_ons");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->addAddOns($data)) {
+            $this->session->set_flashdata('message', lang("Info_added_successfully."));
+            redirect("system_settings/add_ons");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->load->view($this->theme . 'settings/addAddOns', $this->data);
+
+        }
+    }
+
+    function editAddOns($id = NULL)
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->form_validation->set_rules('code', lang("code"), 'trim|required');
+        $sd_details = $this->site->getAddOnsByID($id);
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('code', lang("Code"), 'is_unique[add_ons.code]');
+        }
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required');
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('name', lang("Name"), 'is_unique[add_ons.name]');
+        }
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'price' => $this->input->post('price'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'updated_by' => $this->session->userdata('user_id'),
+                'updated_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('edit_add_ons')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/add_ons");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->updateAddOns($id, $data)) {
+            $this->session->set_flashdata('message', lang("Info_updated_successfully"));
+            redirect("system_settings/add_ons");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->data['sd_detail'] = $sd_details;
+            $this->load->view($this->theme . 'settings/editAddOns', $this->data);
+
+        }
+    }
+
+    function deleteAddOns($id = NULL)
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        if (!$this->site->getAddOnsByID($id)) {
+            $this->session->set_flashdata('error', lang("Operation_Failed"));
+            redirect("system_settings/add_ons");
+        }
+
+        if ($this->settings_model->deleteAddOns($id)) {
+            echo lang("Info_deleted_successfully");
+        }
+    }
+
+    function addOns_actions()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('form_action', lang("form_action"), 'required');
+
+        if ($this->form_validation->run() == true) {
+
+            if (!empty($_POST['val'])) {
+                if ($this->input->post('form_action') == 'delete') {
+                    foreach ($_POST['val'] as $id) {
+                        $this->settings_model->deleteAddOns($id);
+                    }
+                    $this->session->set_flashdata('message', lang("Info_deleted_successfully"));
+                    redirect($_SERVER["HTTP_REFERER"]);
+                }
+            } else {
+                $this->session->set_flashdata('error', lang("No_Record_Selected"));
+                redirect($_SERVER["HTTP_REFERER"]);
+            }
+        } else {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+
+    function delivery_format()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')), array('link' => '#', 'page' => lang('Delivery_Format')));
+        $meta = array('page_title' => lang('Deliver_Format'), 'bc' => $bc);
+        $this->page_construct('settings/delivery_format', $meta, $this->data);
+    }
+
+    function get_delivery_format()
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->load->library('datatables');
+        $this->datatables
+            ->select("{$this->db->dbprefix('delivery_format')}.id as id, {$this->db->dbprefix('delivery_format')}.code, {$this->db->dbprefix('delivery_format')}.name, {$this->db->dbprefix('delivery_format')}.description", FALSE)
+            ->from("delivery_format")
+            ->group_by('delivery_format.id')
+            ->add_column("Actions", "<div class=\"text-center\"><a href='" . site_url('system_settings/editDeliveryFormat/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='" . lang("Edit_Deliver_Format") . "'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("Delete") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/deleteDeliveryFormat/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
+
+        echo $this->datatables->generate();
+    }
+
+    function addDeliveryFormat()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('code', lang("Code"), 'trim|is_unique[delivery_format.code]|required');
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required|is_unique[delivery_format.name]');
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'created_by' => $this->session->userdata('user_id'),
+                'created_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('add_delivery_format')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/delivery_format");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->addDeliveryFormat($data)) {
+            $this->session->set_flashdata('message', lang("Info_added_successfully."));
+            redirect("system_settings/delivery_format");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->load->view($this->theme . 'settings/addDeliveryFormat', $this->data);
+
+        }
+    }
+
+    function editDeliveryFormat($id = NULL)
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->form_validation->set_rules('code', lang("code"), 'trim|required');
+        $sd_details = $this->site->getDeliveryFormatByID($id);
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('code', lang("Code"), 'is_unique[delivery_format.code]');
+        }
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required');
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('name', lang("Name"), 'is_unique[delivery_format.name]');
+        }
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'updated_by' => $this->session->userdata('user_id'),
+                'updated_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('edit_delivery_format')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/delivery_format");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->updateDeliveryFormat($id, $data)) {
+            $this->session->set_flashdata('message', lang("Info_updated_successfully"));
+            redirect("system_settings/delivery_format");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->data['sd_detail'] = $sd_details;
+            $this->load->view($this->theme . 'settings/editDeliveryFormat', $this->data);
+
+        }
+    }
+
+    function deleteDeliveryFormat($id = NULL)
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        if (!$this->site->getDeliveryFormatByID($id)) {
+            $this->session->set_flashdata('error', lang("Operation_Failed"));
+            redirect("system_settings/delivery_format");
+        }
+
+        if ($this->settings_model->deleteDeliveryFormat($id)) {
+            echo lang("Info_deleted_successfully");
+        }
+    }
+
+
+    function deliveryFormat_actions()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('form_action', lang("form_action"), 'required');
+
+        if ($this->form_validation->run() == true) {
+
+            if (!empty($_POST['val'])) {
+                if ($this->input->post('form_action') == 'delete') {
+                    foreach ($_POST['val'] as $id) {
+                        $this->settings_model->deleteDeliveryFormat($id);
+                    }
+                    $this->session->set_flashdata('message', lang("Info_deleted_successfully"));
+                    redirect($_SERVER["HTTP_REFERER"]);
+                }
+            } else {
+                $this->session->set_flashdata('error', lang("No_Record_Selected"));
+                redirect($_SERVER["HTTP_REFERER"]);
+            }
+        } else {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+
+
+    function delivery_time_cost()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')), array('link' => '#', 'page' => lang('Delivery_Time_Cost')));
+        $meta = array('page_title' => lang('Delivery_Time_Cost'), 'bc' => $bc);
+        $this->page_construct('settings/delivery_time_cost', $meta, $this->data);
+    }
+
+    function get_delivery_time_cost()
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->load->library('datatables');
+        $this->datatables
+            ->select("{$this->db->dbprefix('delivery_time_cost')}.id as id, {$this->db->dbprefix('delivery_time_cost')}.code, {$this->db->dbprefix('delivery_time_cost')}.name, {$this->db->dbprefix('delivery_time_cost')}.price,{$this->db->dbprefix('delivery_time_cost')}.description", FALSE)
+            ->from("delivery_time_cost")
+            ->group_by('delivery_time_cost.id')
+            ->add_column("Actions", "<div class=\"text-center\"><a href='" . site_url('system_settings/editDeliveryTimeCost/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='" . lang("Edit_Delivery_Time_Cost") . "'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("Delete") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/deleteDeliveryTimeCost/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
+
+        echo $this->datatables->generate();
+    }
+
+    function addDeliveryTimeCost()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('code', lang("Code"), 'trim|is_unique[delivery_time_cost.code]|required');
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required|is_unique[delivery_time_cost.name]');
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'price' => $this->input->post('price'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'created_by' => $this->session->userdata('user_id'),
+                'created_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('add_delivery_time_cost')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/delivery_time_cost");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->addDeliveryTimeCost($data)) {
+            $this->session->set_flashdata('message', lang("Info_added_successfully."));
+            redirect("system_settings/delivery_time_cost");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->load->view($this->theme . 'settings/addDeliveryTimeCost', $this->data);
+
+        }
+    }
+
+    function editDeliveryTimeCost($id = NULL)
+    {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+
+        $this->form_validation->set_rules('code', lang("code"), 'trim|required');
+        $sd_details = $this->site->getDeliveryTimeCostByID($id);
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('code', lang("Code"), 'is_unique[delivery_time_cost.code]');
+        }
+        $this->form_validation->set_rules('name', lang("Name"), 'trim|required');
+        if ($this->input->post('code') != $sd_details->code) {
+            $this->form_validation->set_rules('name', lang("Name"), 'is_unique[delivery_time_cost.name]');
+        }
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+                'price' => $this->input->post('price'),
+                'description' => $this->input->post('description') ? $this->input->post('description') : NULL,
+                'updated_by' => $this->session->userdata('user_id'),
+                'updated_date' => date("Y-m-d H:i:s")
+            );
+
+        } elseif ($this->input->post('edit_delivery_time_cost')) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect("system_settings/delivery_time_cost");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->editDeliveryTimeCost($id, $data)) {
+            $this->session->set_flashdata('message', lang("Info_updated_successfully"));
+            redirect("system_settings/delivery_time_cost");
+        } else {
+
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->data['sd_detail'] = $sd_details;
+            $this->load->view($this->theme . 'settings/editDeliveryTimeCost', $this->data);
+
+        }
+    }
+
+    function deleteDeliveryTimeCost($id = NULL)
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        if (!$this->site->getDeliveryTimeCostByID($id)) {
+            $this->session->set_flashdata('error', lang("Operation_Failed"));
+            redirect("system_settings/delivery_time_cost");
+        }
+
+        if ($this->settings_model->deleteDeliveryTimeCost($id)) {
+            echo lang("Info_deleted_successfully");
+        }
+    }
+
+    function deliveryTimeCost_actions()
+    {
+
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect('welcome');
+        }
+
+        $this->form_validation->set_rules('form_action', lang("form_action"), 'required');
+
+        if ($this->form_validation->run() == true) {
+
+            if (!empty($_POST['val'])) {
+                if ($this->input->post('form_action') == 'delete') {
+                    foreach ($_POST['val'] as $id) {
+                        $this->settings_model->deleteDeliveryTimeCost($id);
+                    }
+                    $this->session->set_flashdata('message', lang("Info_deleted_successfully"));
+                    redirect($_SERVER["HTTP_REFERER"]);
+                }
+            } else {
+                $this->session->set_flashdata('error', lang("No_Record_Selected"));
+                redirect($_SERVER["HTTP_REFERER"]);
+            }
+        } else {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+
+
 
     function price_groups()
     {
@@ -3033,7 +3647,7 @@ class system_settings extends MY_Controller
                 if ($this->input->post('form_action') == 'update_price') {
 
                     foreach ($_POST['val'] as $id) {
-                        $this->settings_model->setProductPriceForPriceGroup($id, $group_id, $this->input->post('price'.$id));
+                        $this->settings_model->setProductPriceForPriceGroup($id, $group_id, $this->input->post('price' . $id));
                     }
                     $this->session->set_flashdata('message', lang("products_group_price_updated"));
                     redirect($_SERVER["HTTP_REFERER"]);
@@ -3127,7 +3741,7 @@ class system_settings extends MY_Controller
 
         $this->data['price_group'] = $this->settings_model->getPriceGroupByID($group_id);
         $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
-        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')),  array('link' => site_url('system_settings/price_groups'), 'page' => lang('price_groups')), array('link' => '#', 'page' => lang('group_product_prices')));
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => site_url('system_settings'), 'page' => lang('system_settings')), array('link' => site_url('system_settings/price_groups'), 'page' => lang('price_groups')), array('link' => '#', 'page' => lang('group_product_prices')));
         $meta = array('page_title' => lang('group_product_prices'), 'bc' => $bc);
         $this->page_construct('settings/group_product_prices', $meta, $this->data);
     }
@@ -3211,7 +3825,7 @@ class system_settings extends MY_Controller
                 if (!$this->upload->do_upload()) {
                     $error = $this->upload->display_errors();
                     $this->session->set_flashdata('error', $error);
-                    redirect("system_settings/group_product_prices/".$group_id);
+                    redirect("system_settings/group_product_prices/" . $group_id);
                 }
 
                 $csv = $this->upload->file_name;
@@ -3236,14 +3850,14 @@ class system_settings extends MY_Controller
                 $rw = 2;
                 foreach ($final as $csv_pr) {
                     if ($product = $this->site->getProductByCode(trim($csv_pr['code']))) {
-                    $data[] = array(
-                        'product_id' => $product->id,
-                        'price' => $csv_pr['price'],
-                        'price_group_id' => $group_id
+                        $data[] = array(
+                            'product_id' => $product->id,
+                            'price' => $csv_pr['price'],
+                            'price_group_id' => $group_id
                         );
                     } else {
                         $this->session->set_flashdata('message', lang("check_product_code") . " (" . $csv_pr['code'] . "). " . lang("code_x_exist") . " " . lang("line_no") . " " . $rw);
-                        redirect("system_settings/group_product_prices/".$group_id);
+                        redirect("system_settings/group_product_prices/" . $group_id);
                     }
                     $rw++;
                 }
@@ -3251,13 +3865,13 @@ class system_settings extends MY_Controller
 
         } elseif ($this->input->post('update_price')) {
             $this->session->set_flashdata('error', validation_errors());
-            redirect("system_settings/group_product_prices/".$group_id);
+            redirect("system_settings/group_product_prices/" . $group_id);
         }
 
         if ($this->form_validation->run() == true && !empty($data)) {
             $this->settings_model->updateGroupPrices($data);
             $this->session->set_flashdata('message', lang("price_updated"));
-            redirect("system_settings/group_product_prices/".$group_id);
+            redirect("system_settings/group_product_prices/" . $group_id);
         } else {
 
             $this->data['userfile'] = array('name' => 'userfile',
@@ -3267,15 +3881,15 @@ class system_settings extends MY_Controller
             );
             $this->data['group'] = $this->site->getPriceGroupByID($group_id);
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/update_price', $this->data);
+            $this->load->view($this->theme . 'settings/update_price', $this->data);
 
         }
     }
 
     function brands()
     {
-        if(! $this->Owner && ! $this->Admin) {
-        $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['brand-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3290,8 +3904,8 @@ class system_settings extends MY_Controller
     function getBrands()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-        $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['brand-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3299,11 +3913,11 @@ class system_settings extends MY_Controller
         }
 
 //        build  anchor
-        $edit_link='';
+        $edit_link = '';
         if ($this->Owner || $this->Admin || $get_permission['brand-edit'])
-            $edit_link= '<a href="' . site_url("system_settings/edit_brand/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("edit_brand") . '"><i class="fa fa-edit"></i></a>';
+            $edit_link = '<a href="' . site_url("system_settings/edit_brand/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("edit_brand") . '"><i class="fa fa-edit"></i></a>';
 
-        $delete_link='';
+        $delete_link = '';
         if ($this->Owner || $this->Admin || $get_permission['brand-delete'])
 
             $delete_link = "&nbsp<a href='#' class='po' title='<b>" . lang("delete_brand") . "</b>' data-content=\"<p>"
@@ -3314,15 +3928,15 @@ class system_settings extends MY_Controller
         $this->datatables
             ->select("id, image, code, name", FALSE)
             ->from("brands")
-            ->add_column("Actions", "<div class='text-center'>".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class='text-center'>" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
 
     function add_brand()
     {
-        if(! $this->Owner && ! $this->Admin) {
-        $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['brand-add'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -3337,7 +3951,7 @@ class system_settings extends MY_Controller
             $data = array(
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
-                );
+            );
 
             if ($_FILES['userfile']['size'] > 0) {
                 $this->load->library('upload');
@@ -3391,8 +4005,8 @@ class system_settings extends MY_Controller
 
     function edit_brand($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
-        $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['brand-edit'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -3410,7 +4024,7 @@ class system_settings extends MY_Controller
             $data = array(
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
-                );
+            );
 
             if ($_FILES['userfile']['size'] > 0) {
                 $this->load->library('upload');
@@ -3466,8 +4080,8 @@ class system_settings extends MY_Controller
     function delete_brand($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-        $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['brand-delete'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3533,12 +4147,12 @@ class system_settings extends MY_Controller
                 }
 
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getBrandByName(trim($csv_ct['name']))) {
+                    if (!$this->settings_model->getBrandByName(trim($csv_ct['name']))) {
                         $data[] = array(
                             'code' => trim($csv_ct['code']),
                             'name' => trim($csv_ct['name']),
                             'image' => trim($csv_ct['image']),
-                            );
+                        );
                     }
                 }
             }
@@ -3558,7 +4172,7 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_brands', $this->data);
+            $this->load->view($this->theme . 'settings/import_brands', $this->data);
 
         }
     }
@@ -3573,8 +4187,8 @@ class system_settings extends MY_Controller
             if (!empty($_POST['val'])) {
                 if ($this->input->post('form_action') == 'delete') {
 
-                    if(! $this->Owner && ! $this->Admin) {
-                        $get_permission=$this->permission_details[0];
+                    if (!$this->Owner && !$this->Admin) {
+                        $get_permission = $this->permission_details[0];
                         if ((!$get_permission['brand-delete'])) {
                             $this->session->set_flashdata('warning', lang('access_denied'));
                             redirect($_SERVER["HTTP_REFERER"]);
@@ -3654,8 +4268,8 @@ class system_settings extends MY_Controller
 //    company
     function company()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['company-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3670,8 +4284,8 @@ class system_settings extends MY_Controller
     function getCompany()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['company-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3679,11 +4293,11 @@ class system_settings extends MY_Controller
         }
 
 //        build  anchor
-        $edit_link='';
+        $edit_link = '';
         if ($this->Owner || $this->Admin || $get_permission['company-edit'])
-            $edit_link= '<a href="' . site_url("system_settings/edit_company/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("edit_company") . '"><i class="fa fa-edit"></i></a>';
+            $edit_link = '<a href="' . site_url("system_settings/edit_company/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("edit_company") . '"><i class="fa fa-edit"></i></a>';
 
-        $delete_link='';
+        $delete_link = '';
         if ($this->Owner || $this->Admin || $get_permission['company-delete'])
 
             $delete_link = "&nbsp<a href='#' class='po' title='" . lang("delete_company") . "' data-content=\"<p>"
@@ -3694,17 +4308,16 @@ class system_settings extends MY_Controller
         $this->datatables
             ->select("id, code, name", FALSE)
             ->from("company")
-            ->add_column("Actions", "<div class='text-center'>".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class='text-center'>" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
 
 
-
     function add_company()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['company-add'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -3721,8 +4334,7 @@ class system_settings extends MY_Controller
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
             );
-        }
-        elseif ($this->input->post('add_company')) {
+        } elseif ($this->input->post('add_company')) {
             $this->session->set_flashdata('error', validation_errors());
             redirect("system_settings/company");
         }
@@ -3739,8 +4351,8 @@ class system_settings extends MY_Controller
 
     function edit_company($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['company-edit'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -3782,8 +4394,8 @@ class system_settings extends MY_Controller
     function delete_company($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['company-delete'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3848,7 +4460,7 @@ class system_settings extends MY_Controller
                 }
 
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getCompanyByName(trim($csv_ct['name']))) {
+                    if (!$this->settings_model->getCompanyByName(trim($csv_ct['name']))) {
                         $data[] = array(
                             'code' => trim($csv_ct['code']),
                             'name' => trim($csv_ct['name']),
@@ -3872,7 +4484,7 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_company', $this->data);
+            $this->load->view($this->theme . 'settings/import_company', $this->data);
 
         }
     }
@@ -3887,8 +4499,8 @@ class system_settings extends MY_Controller
             if (!empty($_POST['val'])) {
                 if ($this->input->post('form_action') == 'delete') {
 
-                    if(! $this->Owner && ! $this->Admin) {
-                        $get_permission=$this->permission_details[0];
+                    if (!$this->Owner && !$this->Admin) {
+                        $get_permission = $this->permission_details[0];
                         if ((!$get_permission['company-delete'])) {
                             $this->session->set_flashdata('warning', lang('access_denied'));
                             redirect($_SERVER["HTTP_REFERER"]);
@@ -3963,12 +4575,11 @@ class system_settings extends MY_Controller
     }
 
 
-
 //    company
     function designation()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['designation-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3983,8 +4594,8 @@ class system_settings extends MY_Controller
     function getDesignation()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['designation-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -3992,11 +4603,11 @@ class system_settings extends MY_Controller
         }
 
 //        build  anchor
-        $edit_link='';
+        $edit_link = '';
         if ($this->Owner || $this->Admin || $get_permission['designation-edit'])
-            $edit_link= '<a href="' . site_url("system_settings/edit_designation/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("edit_designation") . '"><i class="fa fa-edit"></i></a>';
+            $edit_link = '<a href="' . site_url("system_settings/edit_designation/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("edit_designation") . '"><i class="fa fa-edit"></i></a>';
 
-        $delete_link='';
+        $delete_link = '';
         if ($this->Owner || $this->Admin || $get_permission['designation-delete'])
 
             $delete_link = "&nbsp<a href='#' class='po' title='" . lang("delete_designation") . "' data-content=\"<p>"
@@ -4007,17 +4618,16 @@ class system_settings extends MY_Controller
         $this->datatables
             ->select("id, code, name", FALSE)
             ->from("designations")
-            ->add_column("Actions", "<div class='text-center'>".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class='text-center'>" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
 
 
-
     function add_designation()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['designation-add'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -4034,8 +4644,7 @@ class system_settings extends MY_Controller
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
             );
-        }
-        elseif ($this->input->post('add_designation')) {
+        } elseif ($this->input->post('add_designation')) {
             $this->session->set_flashdata('error', validation_errors());
             redirect("system_settings/designation");
         }
@@ -4052,8 +4661,8 @@ class system_settings extends MY_Controller
 
     function edit_designation($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['designation-edit'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -4095,8 +4704,8 @@ class system_settings extends MY_Controller
     function delete_designation($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['designation-delete'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4159,7 +4768,7 @@ class system_settings extends MY_Controller
                 }
 
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getDesignationByName(trim($csv_ct['name']))) {
+                    if (!$this->settings_model->getDesignationByName(trim($csv_ct['name']))) {
                         $data[] = array(
                             'code' => trim($csv_ct['code']),
                             'name' => trim($csv_ct['name']),
@@ -4182,7 +4791,7 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_designation', $this->data);
+            $this->load->view($this->theme . 'settings/import_designation', $this->data);
 
         }
     }
@@ -4197,8 +4806,8 @@ class system_settings extends MY_Controller
             if (!empty($_POST['val'])) {
                 if ($this->input->post('form_action') == 'delete') {
 
-                    if(! $this->Owner && ! $this->Admin) {
-                        $get_permission=$this->permission_details[0];
+                    if (!$this->Owner && !$this->Admin) {
+                        $get_permission = $this->permission_details[0];
                         if ((!$get_permission['designation-delete'])) {
                             $this->session->set_flashdata('warning', lang('access_denied'));
                             redirect($_SERVER["HTTP_REFERER"]);
@@ -4275,8 +4884,8 @@ class system_settings extends MY_Controller
 
     function package()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['package-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4291,8 +4900,8 @@ class system_settings extends MY_Controller
     function getPackage()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['package-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4300,11 +4909,11 @@ class system_settings extends MY_Controller
         }
 
 //        build  anchor
-        $edit_link='';
+        $edit_link = '';
         if ($this->Owner || $this->Admin || $get_permission['package-edit'])
-            $edit_link= '<a href="' . site_url("system_settings/edit_package/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("edit_package") . '"><i class="fa fa-edit"></i></a>';
+            $edit_link = '<a href="' . site_url("system_settings/edit_package/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("edit_package") . '"><i class="fa fa-edit"></i></a>';
 
-        $delete_link='';
+        $delete_link = '';
         if ($this->Owner || $this->Admin || $get_permission['package-delete'])
 
             $delete_link = "&nbsp<a href='#' class='po' title='" . lang("delete_package") . "' data-content=\"<p>"
@@ -4315,7 +4924,7 @@ class system_settings extends MY_Controller
         $this->datatables
             ->select("id, code, name", FALSE)
             ->from("packages")
-            ->add_column("Actions", "<div class='text-center'>".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class='text-center'>" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
@@ -4323,8 +4932,8 @@ class system_settings extends MY_Controller
 
     function add_package()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['package-add'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -4341,8 +4950,7 @@ class system_settings extends MY_Controller
                 'name' => $this->input->post('name'),
                 'code' => $this->input->post('code'),
             );
-        }
-        elseif ($this->input->post('add_package')) {
+        } elseif ($this->input->post('add_package')) {
             $this->session->set_flashdata('error', validation_errors());
             redirect("system_settings/package");
         }
@@ -4359,8 +4967,8 @@ class system_settings extends MY_Controller
 
     function edit_package($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['package-edit'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -4402,8 +5010,8 @@ class system_settings extends MY_Controller
     function delete_Package($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['package-delete'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4466,7 +5074,7 @@ class system_settings extends MY_Controller
                 }
 
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getPackageByName(trim($csv_ct['name']))) {
+                    if (!$this->settings_model->getPackageByName(trim($csv_ct['name']))) {
                         $data[] = array(
                             'code' => trim($csv_ct['code']),
                             'name' => trim($csv_ct['name']),
@@ -4489,7 +5097,7 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_package', $this->data);
+            $this->load->view($this->theme . 'settings/import_package', $this->data);
 
         }
     }
@@ -4503,8 +5111,8 @@ class system_settings extends MY_Controller
             if (!empty($_POST['val'])) {
                 if ($this->input->post('form_action') == 'delete') {
 
-                    if(! $this->Owner && ! $this->Admin) {
-                        $get_permission=$this->permission_details[0];
+                    if (!$this->Owner && !$this->Admin) {
+                        $get_permission = $this->permission_details[0];
                         if ((!$get_permission['package-delete'])) {
                             $this->session->set_flashdata('warning', lang('access_denied'));
                             redirect($_SERVER["HTTP_REFERER"]);
@@ -4581,8 +5189,8 @@ class system_settings extends MY_Controller
 
     function operator()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['operator-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4597,8 +5205,8 @@ class system_settings extends MY_Controller
     function getOperator()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['operator-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4606,11 +5214,11 @@ class system_settings extends MY_Controller
         }
 
 //        build  anchor
-        $edit_link='';
+        $edit_link = '';
         if ($this->Owner || $this->Admin || $get_permission['operator-edit'])
-            $edit_link= '<a href="' . site_url("system_settings/edit_operator/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("edit_operator") . '"><i class="fa fa-edit"></i></a>';
+            $edit_link = '<a href="' . site_url("system_settings/edit_operator/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("edit_operator") . '"><i class="fa fa-edit"></i></a>';
 
-        $delete_link='';
+        $delete_link = '';
         if ($this->Owner || $this->Admin || $get_permission['operator-delete'])
 
             $delete_link = "&nbsp<a href='#' class='po' title='<b>" . lang("delete_operator") . "</b>' data-content=\"<p>"
@@ -4621,7 +5229,7 @@ class system_settings extends MY_Controller
         $this->datatables
             ->select("id, image, code, name,contact_person,contact_number,address", FALSE)
             ->from("operators")
-            ->add_column("Actions", "<div class='text-center'>".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class='text-center'>" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
@@ -4629,8 +5237,8 @@ class system_settings extends MY_Controller
 
     function add_operator()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['operator-add'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -4706,8 +5314,8 @@ class system_settings extends MY_Controller
 
     function edit_operator($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['operator-edit'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -4755,8 +5363,8 @@ class system_settings extends MY_Controller
     function delete_operator($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['operator-delete'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4814,14 +5422,14 @@ class system_settings extends MY_Controller
                     fclose($handle);
                 }
                 $titles = array_shift($arrResult);
-                $keys = array('name', 'code','contact_person','contact_number','address');
+                $keys = array('name', 'code', 'contact_person', 'contact_number', 'address');
                 $final = array();
                 foreach ($arrResult as $key => $value) {
                     $final[] = array_combine($keys, $value);
                 }
 
                 foreach ($final as $csv_ct) {
-                    if ( ! $this->settings_model->getOperatorByName(trim($csv_ct['name']))) {
+                    if (!$this->settings_model->getOperatorByName(trim($csv_ct['name']))) {
                         $data[] = array(
                             'code' => trim($csv_ct['code']),
                             'name' => trim($csv_ct['name']),
@@ -4848,7 +5456,7 @@ class system_settings extends MY_Controller
                 'value' => $this->form_validation->set_value('userfile')
             );
             $this->data['modal_js'] = $this->site->modal_js();
-            $this->load->view($this->theme.'settings/import_operator', $this->data);
+            $this->load->view($this->theme . 'settings/import_operator', $this->data);
 
         }
     }
@@ -4863,8 +5471,8 @@ class system_settings extends MY_Controller
             if (!empty($_POST['val'])) {
                 if ($this->input->post('form_action') == 'delete') {
 
-                    if(! $this->Owner && ! $this->Admin) {
-                        $get_permission=$this->permission_details[0];
+                    if (!$this->Owner && !$this->Admin) {
+                        $get_permission = $this->permission_details[0];
                         if ((!$get_permission['operator-delete'])) {
                             $this->session->set_flashdata('warning', lang('access_denied'));
                             redirect($_SERVER["HTTP_REFERER"]);
@@ -4947,8 +5555,8 @@ class system_settings extends MY_Controller
 
     function doctype()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['doctype-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4963,8 +5571,8 @@ class system_settings extends MY_Controller
     function getDoctype()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['doctype-index'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -4972,11 +5580,11 @@ class system_settings extends MY_Controller
         }
 
 //        build  anchor
-        $edit_link='';
+        $edit_link = '';
         if ($this->Owner || $this->Admin || $get_permission['doctype-edit'])
-            $edit_link= '<a href="' . site_url("system_settings/edit_doctype/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("edit_operator") . '"><i class="fa fa-edit"></i></a>';
+            $edit_link = '<a href="' . site_url("system_settings/edit_doctype/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("edit_operator") . '"><i class="fa fa-edit"></i></a>';
 
-        $delete_link='';
+        $delete_link = '';
         if ($this->Owner || $this->Admin || $get_permission['doctype-delete'])
 
             $delete_link = "&nbsp<a href='#' class='po' title='<b>" . lang("delete_operator") . "</b>' data-content=\"<p>"
@@ -4987,7 +5595,7 @@ class system_settings extends MY_Controller
         $this->datatables
             ->select("id, name,description", FALSE)
             ->from("doctype")
-            ->add_column("Actions", "<div class='text-center'>".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class='text-center'>" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
@@ -4995,8 +5603,8 @@ class system_settings extends MY_Controller
 
     function add_doctype()
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['doctype-add'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -5035,8 +5643,8 @@ class system_settings extends MY_Controller
 
     function edit_doctype($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['doctype-edit'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
@@ -5076,8 +5684,8 @@ class system_settings extends MY_Controller
     function delete_doctype($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-            $get_permission=$this->permission_details[0];
+        if (!$this->Owner && !$this->Admin) {
+            $get_permission = $this->permission_details[0];
             if ((!$get_permission['doctype-delete'])) {
                 $this->session->set_flashdata('warning', lang('access_denied'));
                 redirect($_SERVER["HTTP_REFERER"]);
@@ -5100,9 +5708,9 @@ class system_settings extends MY_Controller
     function approveres()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-                $this->session->set_flashdata('warning', lang('access_denied'));
-                redirect($_SERVER["HTTP_REFERER"]);
+        if (!$this->Owner && !$this->Admin) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect($_SERVER["HTTP_REFERER"]);
         }
 
         $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
@@ -5114,14 +5722,14 @@ class system_settings extends MY_Controller
     function getApprover()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-                $this->session->set_flashdata('warning', lang('access_denied'));
-                redirect($_SERVER["HTTP_REFERER"]);
+        if (!$this->Owner && !$this->Admin) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect($_SERVER["HTTP_REFERER"]);
         }
-            $edit_link= '&nbsp<a href="' . site_url("system_settings/edit_approver/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("Edit_Approver") . '"><i class="fa fa-edit"></i></a>';
-            $delete_link = "&nbsp<a href='#' class='po' title='<b>" . lang("Delete_Approver") . "</b>' data-content=\"<p>"
-                . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/delete_approver/$1') . "'>"
-                . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i> </a>";
+        $edit_link = '&nbsp<a href="' . site_url("system_settings/edit_approver/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("Edit_Approver") . '"><i class="fa fa-edit"></i></a>';
+        $delete_link = "&nbsp<a href='#' class='po' title='<b>" . lang("Delete_Approver") . "</b>' data-content=\"<p>"
+            . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/delete_approver/$1') . "'>"
+            . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i> </a>";
 
         $this->load->library('datatables');
         $this->datatables
@@ -5131,7 +5739,7 @@ class system_settings extends MY_Controller
             ->join("users", 'users.id=approver_list.approver_id', 'left')
             ->join("categories", 'categories.id=approver_list.category_id', 'left')
             ->group_by('approver_list.id')
-            ->add_column("Actions", "<div class=\"text-center\">".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class=\"text-center\">" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
@@ -5139,10 +5747,10 @@ class system_settings extends MY_Controller
     function add_approver()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
-                $this->session->set_flashdata('warning', lang('access_denied'));
-                die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
-                redirect($_SERVER["HTTP_REFERER"]);
+        if (!$this->Owner && !$this->Admin) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
+            redirect($_SERVER["HTTP_REFERER"]);
         }
 
 
@@ -5188,7 +5796,7 @@ class system_settings extends MY_Controller
     function edit_approver($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
+        if (!$this->Owner && !$this->Admin) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
             redirect($_SERVER["HTTP_REFERER"]);
@@ -5243,9 +5851,9 @@ class system_settings extends MY_Controller
 
     function delete_approver($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
-                $this->session->set_flashdata('warning', lang('access_denied'));
-                redirect($_SERVER["HTTP_REFERER"]);
+        if (!$this->Owner && !$this->Admin) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect($_SERVER["HTTP_REFERER"]);
         }
         if ($this->settings_model->deleteApprover($id)) {
             echo lang("approver_deleted");
@@ -5256,7 +5864,7 @@ class system_settings extends MY_Controller
     function approveres_others()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
+        if (!$this->Owner && !$this->Admin) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             redirect($_SERVER["HTTP_REFERER"]);
         }
@@ -5271,11 +5879,11 @@ class system_settings extends MY_Controller
     function getApproverOthers()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
+        if (!$this->Owner && !$this->Admin) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             redirect($_SERVER["HTTP_REFERER"]);
         }
-        $edit_link= '&nbsp<a href="' . site_url("system_settings/edit_approver_others/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' .  lang("Edit_Approver_Others") . '"><i class="fa fa-edit"></i></a>';
+        $edit_link = '&nbsp<a href="' . site_url("system_settings/edit_approver_others/$1") . '"data-toggle="modal" data-target="#myModal" class="tip" title="' . lang("Edit_Approver_Others") . '"><i class="fa fa-edit"></i></a>';
         $delete_link = "&nbsp<a href='#' class='po' title='<b>" . lang("Delete_Approver_Others") . "</b>' data-content=\"<p>"
             . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('system_settings/delete_approver_others/$1') . "'>"
             . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i> </a>";
@@ -5288,7 +5896,7 @@ class system_settings extends MY_Controller
             ->join("users", 'users.id=approver_list_other.approver_id', 'left')
             ->join("doctype", 'doctype.id=approver_list_other.category_id', 'left')
             ->group_by('approver_list_other.id')
-            ->add_column("Actions", "<div class=\"text-center\">".$edit_link.$delete_link."</div>", "id");
+            ->add_column("Actions", "<div class=\"text-center\">" . $edit_link . $delete_link . "</div>", "id");
 
         echo $this->datatables->generate();
     }
@@ -5296,7 +5904,7 @@ class system_settings extends MY_Controller
     function add_approver_others()
     {
 
-        if(! $this->Owner && ! $this->Admin) {
+        if (!$this->Owner && !$this->Admin) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
             redirect($_SERVER["HTTP_REFERER"]);
@@ -5347,7 +5955,7 @@ class system_settings extends MY_Controller
     function edit_approver_others($id = NULL)
     {
 
-        if(! $this->Owner && ! $this->Admin) {
+        if (!$this->Owner && !$this->Admin) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             die("<script type='text/javascript'>setTimeout(function(){ window.top.location.href = '" . (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : site_url('welcome')) . "'; }, 10);</script>");
             redirect($_SERVER["HTTP_REFERER"]);
@@ -5404,7 +6012,7 @@ class system_settings extends MY_Controller
 
     function delete_approver_others($id = NULL)
     {
-        if(! $this->Owner && ! $this->Admin) {
+        if (!$this->Owner && !$this->Admin) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             redirect($_SERVER["HTTP_REFERER"]);
         }

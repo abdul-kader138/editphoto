@@ -76,11 +76,18 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
+                                    <td><?= lang("Invoices"); ?></td>
+                                    <td class="text-center">
+                                        <input type="checkbox" value="1" class="checkbox" name="invoices-index" <?php echo $p->{'invoices-index'} ? "checked" : ''; ?>>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" value="1" class="checkbox" name="invoices-add" <?php echo $p->{'invoices-add'} ? "checked" : ''; ?>>
+                                    </td>
+                                    <td class="text-center">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" value="1" class="checkbox" name="invoices-delete" <?php echo $p->{'invoices-delete'} ? "checked" : ''; ?>>
+                                    </td>
                                     <td>&nbsp;</td>
                                 </tr>
 

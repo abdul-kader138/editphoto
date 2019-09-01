@@ -2,7 +2,8 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Auth_model extends CI_Model {
+class Auth_model extends CI_Model
+{
 
     public $tables = array();
     public $activation_code;
@@ -25,7 +26,8 @@ class Auth_model extends CI_Model {
     public $_cache_user_in_group = array();
     protected $_cache_groups = array();
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->load->config('ion_auth', TRUE);
@@ -96,7 +98,8 @@ class Auth_model extends CI_Model {
         $this->trigger_events('model_constructor');
     }
 
-    public function getStaffLoginByID($id) {
+    public function getStaffLoginByID($id)
+    {
         $q = $this->db->get_where("user_logins", array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -104,7 +107,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function getStaffLogoutByID($id) {
+    public function getStaffLogoutByID($id)
+    {
         $q = $this->db->get_where("user_logouts", array('id' => $id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -112,7 +116,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function updateStaffLogin($id, $data = array()) {
+    public function updateStaffLogin($id, $data = array())
+    {
         $loginData = array('login' => $data['login'], 'ip_address' => $data['ip_address'], 'time' => $data['time']);
 
         $this->db->where('id', $id);
@@ -122,7 +127,8 @@ class Auth_model extends CI_Model {
         return false;
     }
 
-    public function updateStaffLogout($id, $data = array()) {
+    public function updateStaffLogout($id, $data = array())
+    {
         $logoutData = array('login' => $data['login'], 'ip_address' => $data['ip_address'], 'time' => $data['time']);
 
         $this->db->where('id', $id);
@@ -132,11 +138,12 @@ class Auth_model extends CI_Model {
         return false;
     }
 
-    public function addlogin($data = array()) {
+    public function addlogin($data = array())
+    {
 
         $query = $this->db->select('id')
-                ->where('email', $data['login'])
-                ->get($this->tables['users']);
+            ->where('email', $data['login'])
+            ->get($this->tables['users']);
 
         $get_id = $query->row();
 
@@ -147,17 +154,17 @@ class Auth_model extends CI_Model {
         $loginData = array('user_id' => $get_id->id, 'login' => $data['login'], 'ip_address' => $data['ip_address'], 'time' => $data['time']);
 
 
-
         if ($this->db->insert("user_logins", $loginData)) {
             return true;
         }
         return false;
     }
 
-    public function addlogout($data = array()) {
+    public function addlogout($data = array())
+    {
         $query = $this->db->select('id')
-                ->where('email', $data['login'])
-                ->get($this->tables['users']);
+            ->where('email', $data['login'])
+            ->get($this->tables['users']);
 
         $get_id = $query->row();
 
@@ -168,14 +175,14 @@ class Auth_model extends CI_Model {
         $logoutData = array('user_id' => $get_id->id, 'login' => $data['login'], 'ip_address' => $data['ip_address'], 'time' => $data['time']);
 
 
-
         if ($this->db->insert("user_logouts", $logoutData)) {
             return true;
         }
         return false;
     }
 
-    public function hash_password($password, $salt = false, $use_sha1_override = FALSE) {
+    public function hash_password($password, $salt = false, $use_sha1_override = FALSE)
+    {
         if (empty($password)) {
             return FALSE;
         }
@@ -194,7 +201,8 @@ class Auth_model extends CI_Model {
         }
     }
 
-    public function hash_password_db($id, $password, $use_sha1_override = FALSE) {
+    public function hash_password_db($id, $password, $use_sha1_override = FALSE)
+    {
         if (empty($id) || empty($password)) {
             return FALSE;
         }
@@ -202,9 +210,9 @@ class Auth_model extends CI_Model {
         $this->trigger_events('extra_where');
 
         $query = $this->db->select('password, salt')
-                ->where('id', $id)
-                ->limit(1)
-                ->get($this->tables['users']);
+            ->where('id', $id)
+            ->limit(1)
+            ->get($this->tables['users']);
 
         $hash_password_db = $query->row();
 
@@ -237,22 +245,25 @@ class Auth_model extends CI_Model {
         }
     }
 
-    public function hash_code($password) {
+    public function hash_code($password)
+    {
         return $this->hash_password($password, FALSE, TRUE);
     }
 
-    public function salt() {
+    public function salt()
+    {
         return substr(md5(uniqid(rand(), true)), 0, $this->salt_length);
     }
 
-    public function activate($id, $code = false) {
+    public function activate($id, $code = false)
+    {
         $this->trigger_events('pre_activate');
 
         if ($code !== FALSE) {
             $query = $this->db->select($this->identity_column)
-                    ->where('activation_code', $code)
-                    ->limit(1)
-                    ->get($this->tables['users']);
+                ->where('activation_code', $code)
+                ->limit(1)
+                ->get($this->tables['users']);
 
             $result = $query->row();
 
@@ -266,7 +277,7 @@ class Auth_model extends CI_Model {
 
             $data = array(
                 'activation_code' => NULL,
-                'active' => '-1'
+                'active' => '1'
             );
 
             $this->trigger_events('extra_where');
@@ -298,7 +309,8 @@ class Auth_model extends CI_Model {
         return $return;
     }
 
-    public function deactivate($id = NULL) {
+    public function deactivate($id = NULL)
+    {
         $this->trigger_events('deactivate');
 
         if (!isset($id)) {
@@ -326,7 +338,8 @@ class Auth_model extends CI_Model {
         return $return;
     }
 
-    public function clear_forgotten_password_code($code) {
+    public function clear_forgotten_password_code($code)
+    {
 
         if (empty($code)) {
             return FALSE;
@@ -348,7 +361,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function reset_password($identity, $new) {
+    public function reset_password($identity, $new)
+    {
         $this->trigger_events('pre_change_password');
 
         if (!$this->identity_check($identity)) {
@@ -359,9 +373,9 @@ class Auth_model extends CI_Model {
         $this->trigger_events('extra_where');
 
         $query = $this->db->select('id, password, salt')
-                ->where($this->identity_column, $identity)
-                ->limit(1)
-                ->get($this->tables['users']);
+            ->where($this->identity_column, $identity)
+            ->limit(1)
+            ->get($this->tables['users']);
 
         if ($query->num_rows() !== 1) {
             $this->trigger_events(array('post_change_password', 'post_change_password_unsuccessful'));
@@ -397,15 +411,16 @@ class Auth_model extends CI_Model {
         return $return;
     }
 
-    public function change_password($identity, $old, $new) {
+    public function change_password($identity, $old, $new)
+    {
         $this->trigger_events('pre_change_password');
 
         $this->trigger_events('extra_where');
 
         $query = $this->db->select('id, password, salt')
-                ->where($this->identity_column, $identity)
-                ->limit(1)
-                ->get($this->tables['users']);
+            ->where($this->identity_column, $identity)
+            ->limit(1)
+            ->get($this->tables['users']);
 
         if ($query->num_rows() !== 1) {
             $this->trigger_events(array('post_change_password', 'post_change_password_unsuccessful'));
@@ -445,7 +460,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function username_check($username = '') {
+    public function username_check($username = '')
+    {
         $this->trigger_events('username_check');
 
         if (empty($username)) {
@@ -455,10 +471,11 @@ class Auth_model extends CI_Model {
         $this->trigger_events('extra_where');
 
         return $this->db->where('username', $username)
-                        ->count_all_results($this->tables['users']) > 0;
+                ->count_all_results($this->tables['users']) > 0;
     }
 
-    public function email_check($email = '') {
+    public function email_check($email = '')
+    {
         $this->trigger_events('email_check');
 
         if (empty($email)) {
@@ -468,10 +485,11 @@ class Auth_model extends CI_Model {
         $this->trigger_events('extra_where');
 
         return $this->db->where('email', $email)
-                        ->count_all_results($this->tables['users']) > 0;
+                ->count_all_results($this->tables['users']) > 0;
     }
 
-    public function identity_check($identity = '') {
+    public function identity_check($identity = '')
+    {
         $this->trigger_events('identity_check');
 
         if (empty($identity)) {
@@ -479,10 +497,11 @@ class Auth_model extends CI_Model {
         }
 
         return $this->db->where($this->identity_column, $identity)
-                        ->count_all_results($this->tables['users']) > 0;
+                ->count_all_results($this->tables['users']) > 0;
     }
 
-    public function forgotten_password($identity) {
+    public function forgotten_password($identity)
+    {
         if (empty($identity)) {
             $this->trigger_events(array('post_forgotten_password', 'post_forgotten_password_unsuccessful'));
             return FALSE;
@@ -521,7 +540,8 @@ class Auth_model extends CI_Model {
         return $return;
     }
 
-    public function forgotten_password_complete($code, $salt = FALSE) {
+    public function forgotten_password_complete($code, $salt = FALSE)
+    {
         $this->trigger_events('pre_forgotten_password_complete');
 
         if (empty($code)) {
@@ -562,7 +582,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function register($username, $password, $email, $additional_data = array(), $active = FALSE) {
+    public function register($username, $password, $email, $additional_data = array(), $active = FALSE)
+    {
         $this->trigger_events('pre_register');
 
         $manual_activation = $this->config->item('manual_activation', 'ion_auth');
@@ -636,7 +657,8 @@ class Auth_model extends CI_Model {
         return (isset($id)) ? $id : FALSE;
     }
 
-    public function userLogouts() {
+    public function userLogouts()
+    {
         $user_id = $this->session->userdata('user_id');
         $user_identity = $this->session->userdata('email');
 
@@ -647,14 +669,14 @@ class Auth_model extends CI_Model {
         $ip_address = $this->db->get()->row()->ip_address;
 
 
-
         $ldata = array('user_id' => $user_id, 'ip_address' => $ip_address, 'login' => $user_identity);
         $this->db->insert('user_logouts', $ldata);
 
         return TRUE;
     }
 
-    public function login($identity, $password, $remember = FALSE) {
+    public function login($identity, $password, $remember = FALSE)
+    {
         $this->trigger_events('pre_login');
 
         if (empty($identity) || empty($password)) {
@@ -666,9 +688,9 @@ class Auth_model extends CI_Model {
         $this->load->helper('email');
         $this->identity_column = valid_email($identity) ? 'email' : 'username';
         $query = $this->db->select($this->identity_column . ', username, email, id, password, active, last_login, last_ip_address, avatar, gender, group_id,company, view_right, edit_right')
-                ->where($this->identity_column, $this->db->escape_str($identity))
-                ->limit(1)
-                ->get($this->tables['users']);
+            ->where($this->identity_column, $this->db->escape_str($identity))
+            ->limit(1)
+            ->get($this->tables['users']);
 
         if ($this->is_time_locked_out($identity)) {
             //Hash something anyway, just to take up time
@@ -741,7 +763,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function is_max_login_attempts_exceeded($identity) {
+    public function is_max_login_attempts_exceeded($identity)
+    {
         if ($this->config->item('track_login_attempts', 'ion_auth')) {
             $max_attempts = $this->config->item('maximum_login_attempts', 'ion_auth');
             if ($max_attempts > 0) {
@@ -752,7 +775,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    function get_attempts_num($identity) {
+    function get_attempts_num($identity)
+    {
         if ($this->config->item('track_login_attempts', 'ion_auth')) {
             $ip_address = $this->_prepare_ip($this->input->ip_address());
             $this->db->select('1', FALSE);
@@ -766,12 +790,14 @@ class Auth_model extends CI_Model {
         return 0;
     }
 
-    public function is_time_locked_out($identity) {
+    public function is_time_locked_out($identity)
+    {
 
         return $this->is_max_login_attempts_exceeded($identity) && $this->get_last_attempt_time($identity) > time() - $this->config->item('lockout_time', 'ion_auth');
     }
 
-    public function get_last_attempt_time($identity) {
+    public function get_last_attempt_time($identity)
+    {
         if ($this->config->item('track_login_attempts', 'ion_auth')) {
             $ip_address = $this->_prepare_ip($this->input->ip_address());
 
@@ -790,7 +816,8 @@ class Auth_model extends CI_Model {
         return 0;
     }
 
-    public function increase_login_attempts($identity) {
+    public function increase_login_attempts($identity)
+    {
         if ($this->config->item('track_login_attempts', 'ion_auth')) {
             $ip_address = $this->_prepare_ip($this->input->ip_address());
             return $this->db->insert($this->tables['login_attempts'], array('ip_address' => $ip_address, 'login' => $identity, 'time' => time()));
@@ -798,7 +825,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function clear_login_attempts($identity, $expire_period = 86400) {
+    public function clear_login_attempts($identity, $expire_period = 86400)
+    {
         if ($this->config->item('track_login_attempts', 'ion_auth')) {
             $ip_address = $this->_prepare_ip($this->input->ip_address());
 
@@ -811,21 +839,24 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function limit($limit) {
+    public function limit($limit)
+    {
         $this->trigger_events('limit');
         $this->_ion_limit = $limit;
 
         return $this;
     }
 
-    public function offset($offset) {
+    public function offset($offset)
+    {
         $this->trigger_events('offset');
         $this->_ion_offset = $offset;
 
         return $this;
     }
 
-    public function where($where, $value = NULL) {
+    public function where($where, $value = NULL)
+    {
         $this->trigger_events('where');
 
         if (!is_array($where)) {
@@ -837,13 +868,14 @@ class Auth_model extends CI_Model {
         return $this;
     }
 
-    public function like($like, $value = NULL, $position = 'both') {
+    public function like($like, $value = NULL, $position = 'both')
+    {
         $this->trigger_events('like');
 
         if (!is_array($like)) {
             $like = array($like => array(
-                    'value' => $value,
-                    'position' => $position,
+                'value' => $value,
+                'position' => $position,
             ));
         }
 
@@ -852,7 +884,8 @@ class Auth_model extends CI_Model {
         return $this;
     }
 
-    public function select($select) {
+    public function select($select)
+    {
         $this->trigger_events('select');
 
         $this->_ion_select[] = $select;
@@ -860,7 +893,8 @@ class Auth_model extends CI_Model {
         return $this;
     }
 
-    public function order_by($by, $order = 'desc') {
+    public function order_by($by, $order = 'desc')
+    {
         $this->trigger_events('order_by');
 
         $this->_ion_order_by = $by;
@@ -869,7 +903,8 @@ class Auth_model extends CI_Model {
         return $this;
     }
 
-    public function row() {
+    public function row()
+    {
         $this->trigger_events('row');
 
         $row = $this->response->row();
@@ -878,7 +913,8 @@ class Auth_model extends CI_Model {
         return $row;
     }
 
-    public function row_array() {
+    public function row_array()
+    {
         $this->trigger_events(array('row', 'row_array'));
 
         $row = $this->response->row_array();
@@ -887,7 +923,8 @@ class Auth_model extends CI_Model {
         return $row;
     }
 
-    public function result() {
+    public function result()
+    {
         $this->trigger_events('result');
 
         $result = $this->response->result();
@@ -896,7 +933,8 @@ class Auth_model extends CI_Model {
         return $result;
     }
 
-    public function result_array() {
+    public function result_array()
+    {
         $this->trigger_events(array('result', 'result_array'));
 
         $result = $this->response->result_array();
@@ -905,7 +943,8 @@ class Auth_model extends CI_Model {
         return $result;
     }
 
-    public function num_rows() {
+    public function num_rows()
+    {
         $this->trigger_events(array('num_rows'));
 
         $result = $this->response->num_rows();
@@ -914,7 +953,8 @@ class Auth_model extends CI_Model {
         return $result;
     }
 
-    public function users($groups = NULL) {
+    public function users($groups = NULL)
+    {
         $this->trigger_events('users');
 
         if (isset($this->_ion_select) && !empty($this->_ion_select)) {
@@ -993,7 +1033,8 @@ class Auth_model extends CI_Model {
         return $this;
     }
 
-    public function user($id = NULL) {
+    public function user($id = NULL)
+    {
         $this->trigger_events('user');
 
         //if no id was passed use the current users id
@@ -1013,16 +1054,17 @@ class Auth_model extends CI_Model {
      * @return array
      * @author Ben Edmunds
      * */
-    public function get_users_group($id = FALSE) {
+    public function get_users_group($id = FALSE)
+    {
         $this->trigger_events('get_users_group');
 
         //if no id was passed use the current users id
         $id || $id = $this->session->userdata('user_id');
 
         return $this->db->select($this->tables['groups'] . '.id as id, ' . $this->tables['groups'] . '.name, ' . $this->tables['groups'] . '.description')
-                        ->where($this->tables['groups'] . '.id', $id)
-                        //->join($this->tables['groups'], $this->tables['users_groups'] . '.' . $this->join['groups'] . '=' . $this->tables['groups'] . '.id')
-                        ->get($this->tables['groups']);
+            ->where($this->tables['groups'] . '.id', $id)
+            //->join($this->tables['groups'], $this->tables['users_groups'] . '.' . $this->join['groups'] . '=' . $this->tables['groups'] . '.id')
+            ->get($this->tables['groups']);
     }
 
     /**
@@ -1031,7 +1073,8 @@ class Auth_model extends CI_Model {
      * @return object
      * @author Ben Edmunds
      * */
-    public function groups() {
+    public function groups()
+    {
         $this->trigger_events('groups');
 
         //run each where that was passed
@@ -1063,7 +1106,8 @@ class Auth_model extends CI_Model {
         return $this;
     }
 
-    public function group($id = NULL) {
+    public function group($id = NULL)
+    {
         $this->trigger_events('group');
 
         if (isset($id)) {
@@ -1075,7 +1119,8 @@ class Auth_model extends CI_Model {
         return $this->groups();
     }
 
-    public function update($id, array $data, $upgs = array()) {
+    public function update($id, array $data, $upgs = array())
+    {
         $this->trigger_events('pre_update_user');
 
         $user = $this->user($id)->row();
@@ -1124,7 +1169,8 @@ class Auth_model extends CI_Model {
         return TRUE;
     }
 
-    public function usersProductGroups($upg) {
+    public function usersProductGroups($upg)
+    {
         If ($this->getUPG($upg['user_id'], $upg['product_group_id'])) {
             $this->db->update('users_product_groups', array('user_id' => $upg['user_id'], 'product_group_id' => $upg['product_group_id'], 'percent' => $upg['percent']), array('user_id' => $upg['user_id'], 'product_group_id' => $upg['product_group_id']));
             return true;
@@ -1135,7 +1181,8 @@ class Auth_model extends CI_Model {
         return false;
     }
 
-    public function getUPG($user_id, $product_group_id) {
+    public function getUPG($user_id, $product_group_id)
+    {
         $q = $this->db->get_where('users_product_groups', array('user_id' => $user_id, 'product_group_id' => $product_group_id), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
@@ -1144,7 +1191,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function delete_user($id) {
+    public function delete_user($id)
+    {
         $this->trigger_events('pre_delete_user');
 
         $this->db->trans_begin();
@@ -1173,7 +1221,8 @@ class Auth_model extends CI_Model {
         return TRUE;
     }
 
-    public function update_last_login($id) {
+    public function update_last_login($id)
+    {
         $this->trigger_events('update_last_login');
 
         $this->load->helper('date');
@@ -1185,7 +1234,8 @@ class Auth_model extends CI_Model {
         return $this->db->affected_rows() == 1;
     }
 
-    public function update_last_login_ip($id) {
+    public function update_last_login_ip($id)
+    {
         $this->trigger_events('update_last_login_ip');
 
         $this->trigger_events('extra_where');
@@ -1195,7 +1245,8 @@ class Auth_model extends CI_Model {
         return $this->db->affected_rows() == 1;
     }
 
-    public function set_lang($lang = 'en') {
+    public function set_lang($lang = 'en')
+    {
         $this->trigger_events('set_lang');
 
         // if the user_expire is set to zero we'll set the expiration two years from now.
@@ -1215,7 +1266,8 @@ class Auth_model extends CI_Model {
         return TRUE;
     }
 
-    public function set_session($user) {
+    public function set_session($user)
+    {
 
         $this->trigger_events('pre_set_session');
 
@@ -1246,7 +1298,8 @@ class Auth_model extends CI_Model {
         return TRUE;
     }
 
-    public function remember_user($id) {
+    public function remember_user($id)
+    {
         $this->trigger_events('pre_remember_user');
 
         if (!$id) {
@@ -1288,7 +1341,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function login_remembered_user() {
+    public function login_remembered_user()
+    {
         $this->trigger_events('pre_login_remembered_user');
 
         //check for valid data
@@ -1300,10 +1354,10 @@ class Auth_model extends CI_Model {
         //get the user
         $this->trigger_events('extra_where');
         $query = $this->db->select($this->identity_column . ', id, username, email, last_login, last_ip_address, avatar, gender, group_id, warehouse_id, biller_id, company_id, view_right, allow_discount, edit_right, show_cost, show_price')
-                ->where($this->identity_column, get_cookie('identity'))
-                ->where('remember_code', get_cookie('remember_code'))
-                ->limit(1)
-                ->get($this->tables['users']);
+            ->where($this->identity_column, get_cookie('identity'))
+            ->where('remember_code', get_cookie('remember_code'))
+            ->limit(1)
+            ->get($this->tables['users']);
 
         //if the user was found, sign them in
         if ($query->num_rows() == 1) {
@@ -1327,7 +1381,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function create_group($group_name = FALSE, $group_description = '', $additional_data = array()) {
+    public function create_group($group_name = FALSE, $group_description = '', $additional_data = array())
+    {
         // bail if the group name was not passed
         if (!$group_name) {
             $this->set_error('group_name_required');
@@ -1360,7 +1415,8 @@ class Auth_model extends CI_Model {
         return $group_id;
     }
 
-    public function update_group($group_id = FALSE, $group_name = FALSE, $additional_data = array()) {
+    public function update_group($group_id = FALSE, $group_name = FALSE, $additional_data = array())
+    {
         if (empty($group_id))
             return FALSE;
 
@@ -1398,7 +1454,8 @@ class Auth_model extends CI_Model {
         return TRUE;
     }
 
-    public function delete_group($group_id = FALSE) {
+    public function delete_group($group_id = FALSE)
+    {
         // bail if mandatory param not set
         if (!$group_id || empty($group_id)) {
             return FALSE;
@@ -1427,26 +1484,30 @@ class Auth_model extends CI_Model {
         return TRUE;
     }
 
-    public function set_hook($event, $name, $class, $method, $arguments) {
+    public function set_hook($event, $name, $class, $method, $arguments)
+    {
         $this->_ion_hooks->{$event}[$name] = new stdClass;
         $this->_ion_hooks->{$event}[$name]->class = $class;
         $this->_ion_hooks->{$event}[$name]->method = $method;
         $this->_ion_hooks->{$event}[$name]->arguments = $arguments;
     }
 
-    public function remove_hook($event, $name) {
+    public function remove_hook($event, $name)
+    {
         if (isset($this->_ion_hooks->{$event}[$name])) {
             unset($this->_ion_hooks->{$event}[$name]);
         }
     }
 
-    public function remove_hooks($event) {
+    public function remove_hooks($event)
+    {
         if (isset($this->_ion_hooks->$event)) {
             unset($this->_ion_hooks->$event);
         }
     }
 
-    protected function _call_hook($event, $name) {
+    protected function _call_hook($event, $name)
+    {
         if (isset($this->_ion_hooks->{$event}[$name]) && method_exists($this->_ion_hooks->{$event}[$name]->class, $this->_ion_hooks->{$event}[$name]->method)) {
             $hook = $this->_ion_hooks->{$event}[$name];
 
@@ -1456,7 +1517,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function trigger_events($events) {
+    public function trigger_events($events)
+    {
         if (is_array($events) && !empty($events)) {
             foreach ($events as $event) {
                 $this->trigger_events($event);
@@ -1470,27 +1532,31 @@ class Auth_model extends CI_Model {
         }
     }
 
-    public function set_message_delimiters($start_delimiter, $end_delimiter) {
+    public function set_message_delimiters($start_delimiter, $end_delimiter)
+    {
         $this->message_start_delimiter = $start_delimiter;
         $this->message_end_delimiter = $end_delimiter;
 
         return TRUE;
     }
 
-    public function set_error_delimiters($start_delimiter, $end_delimiter) {
+    public function set_error_delimiters($start_delimiter, $end_delimiter)
+    {
         $this->error_start_delimiter = $start_delimiter;
         $this->error_end_delimiter = $end_delimiter;
 
         return TRUE;
     }
 
-    public function set_message($message) {
+    public function set_message($message)
+    {
         $this->messages[] = $message;
 
         return $message;
     }
 
-    public function messages() {
+    public function messages()
+    {
         $_output = '';
         foreach ($this->messages as $message) {
             $messageLang = $this->lang->line($message) ? $this->lang->line($message) : '##' . $message . '##';
@@ -1500,7 +1566,8 @@ class Auth_model extends CI_Model {
         return $_output;
     }
 
-    public function messages_array($langify = TRUE) {
+    public function messages_array($langify = TRUE)
+    {
         if ($langify) {
             $_output = array();
             foreach ($this->messages as $message) {
@@ -1513,13 +1580,15 @@ class Auth_model extends CI_Model {
         }
     }
 
-    public function set_error($error) {
+    public function set_error($error)
+    {
         $this->errors[] = $error;
 
         return $error;
     }
 
-    public function errors() {
+    public function errors()
+    {
         $_output = '';
         foreach ($this->errors as $error) {
             $errorLang = $this->lang->line($error) ? $this->lang->line($error) : '##' . $error . '##';
@@ -1529,7 +1598,8 @@ class Auth_model extends CI_Model {
         return $_output;
     }
 
-    public function errors_array($langify = TRUE) {
+    public function errors_array($langify = TRUE)
+    {
         if ($langify) {
             $_output = array();
             foreach ($this->errors as $error) {
@@ -1542,7 +1612,8 @@ class Auth_model extends CI_Model {
         }
     }
 
-    protected function _filter_data($table, $data) {
+    protected function _filter_data($table, $data)
+    {
         $filtered_data = array();
         $columns = $this->db->list_fields($table);
 
@@ -1556,7 +1627,8 @@ class Auth_model extends CI_Model {
         return $filtered_data;
     }
 
-    protected function _prepare_ip($ip_address) {
+    protected function _prepare_ip($ip_address)
+    {
         if ($this->db->platform() === 'postgre' || $this->db->platform() === 'sqlsrv' || $this->db->platform() === 'mssql' || $this->db->platform() === 'mysqli' || $this->db->platform() === 'mysql') {
             return $ip_address;
         } else {
@@ -1564,7 +1636,8 @@ class Auth_model extends CI_Model {
         }
     }
 
-    public function updateAvatar($id, $avatar) {
+    public function updateAvatar($id, $avatar)
+    {
         if ($this->db->update($this->tables['users'], array('avatar' => $avatar), array('id' => $id))) {
             $this->set_message('avatar_updated');
             return TRUE;
@@ -1572,7 +1645,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function getBillingAddress($id) {
+    public function getBillingAddress($id)
+    {
 
         $q = $this->db->get_where("addresses", array('user_id' => $id, 'type' => 'billing'), 1);
         if ($q->num_rows() > 0) {
@@ -1582,7 +1656,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function getDeliveryAddress($id) {
+    public function getDeliveryAddress($id)
+    {
 
         $q = $this->db->get_where("addresses", array('user_id' => $id, 'type' => 'delivery'), 1);
         if ($q->num_rows() > 0) {
@@ -1592,7 +1667,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function getAllProductGroups() {
+    public function getAllProductGroups()
+    {
         $q = $this->db->get('product_groups');
         if ($q->num_rows() > 0) {
             foreach (($q->result()) as $row) {
@@ -1603,7 +1679,8 @@ class Auth_model extends CI_Model {
         }
     }
 
-    public function getProductGroupByID($id) {
+    public function getProductGroupByID($id)
+    {
 
         $q = $this->db->get_where('product_groups', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
@@ -1613,7 +1690,8 @@ class Auth_model extends CI_Model {
         return FALSE;
     }
 
-    public function getAllUserProductGroups($id) {
+    public function getAllUserProductGroups($id)
+    {
         $jn = "( SELECT upg.product_group_id as pgi, upg.user_id as ui, upg.percent as percent from users_product_groups upg where
                          upg.user_id = '{$id}' ) UPG";
 
@@ -1621,8 +1699,8 @@ class Auth_model extends CI_Model {
        THEN UPG.percent
        ELSE product_groups.percent
 END) as percent")
-                ->join($jn, 'product_groups.id=UPG.pgi', 'left')
-                ->group_by('product_groups.id');
+            ->join($jn, 'product_groups.id=UPG.pgi', 'left')
+            ->group_by('product_groups.id');
         $q = $this->db->get('product_groups');
         if ($q->num_rows() > 0) {
             foreach (($q->result()) as $row) {
@@ -1633,7 +1711,8 @@ END) as percent")
         }
     }
 
-    public function updateUser($id, $admin) {
+    public function updateUser($id, $admin)
+    {
         if ($this->db->update("users", array('admin_id' => $admin), array('id' => $id))) {
             $this->db->update("orders", array('admin_id' => $admin), array('customer_id' => $id));
             $this->db->update("drafts", array('admin_id' => $admin), array('customer_id' => $id));
@@ -1643,7 +1722,8 @@ END) as percent")
         }
     }
 
-    public function checkpunchinn($ieid) {
+    public function checkpunchinn($ieid)
+    {
         $q = $this->db->get_where('workingtime', array('login' => $ieid, 'date(logintime)' => date('Y-m-d')), 1);
         if ($q->num_rows() > 0) {
             return TRUE;
@@ -1651,14 +1731,16 @@ END) as percent")
         return FALSE;
     }
 
-    public function punchin($data = array()) {
+    public function punchin($data = array())
+    {
         if ($this->db->insert('workingtime', $data)) {
             return true;
         }
         return false;
     }
 
-    public function punchout($dataupdate = array()) {
+    public function punchout($dataupdate = array())
+    {
 
         $this->db->where('date(logintime)', date('Y-m-d'));
         $this->db->where('login', $this->session->userdata('email'));
@@ -1668,11 +1750,12 @@ END) as percent")
         return false;
     }
 
-    public function reloginConfirmation($identity, $password) {
+    public function reloginConfirmation($identity, $password)
+    {
         $query = $this->db->select('id, first_name, last_name')
-                ->where($this->identity_column, $this->db->escape_str($identity))
-                ->limit(1)
-                ->get($this->tables['users']);
+            ->where($this->identity_column, $this->db->escape_str($identity))
+            ->limit(1)
+            ->get($this->tables['users']);
 
         if ($query->num_rows() === 1) {
             $user = $query->row();
@@ -1685,4 +1768,18 @@ END) as percent")
         return false;
     }
 
+    public function activation_code_update($id = NULL, $activation_code)
+    {
+
+        $data = array(
+            'activation_code' => $activation_code,
+            'active' => 1
+        );
+
+        $this->trigger_events('extra_where');
+        $this->db->update($this->tables['users'], $data, array('id' => $id));
+
+        $return = $this->db->affected_rows() == 1;
+        return $return;
+    }
 }

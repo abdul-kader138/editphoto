@@ -26,10 +26,10 @@ class Auth extends MY_Controller
 
     function users()
     {
-        if ( ! $this->loggedIn) {
+        if (!$this->loggedIn) {
             redirect('login');
         }
-        if ( ! $this->Owner) {
+        if (!$this->Owner) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             redirect(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'welcome');
         }
@@ -43,14 +43,14 @@ class Auth extends MY_Controller
 
     function getUsers()
     {
-        if ( ! $this->Owner) {
+        if (!$this->Owner) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             $this->sma->md();
         }
 
         $this->load->library('datatables');
         $this->datatables
-            ->select($this->db->dbprefix('users').".id as id, first_name, last_name, email, company, phone, " . $this->db->dbprefix('groups') . ".name, active")
+            ->select($this->db->dbprefix('users') . ".id as id, first_name, last_name, email, company, phone, " . $this->db->dbprefix('groups') . ".name, active")
             ->from("users")
             ->join('groups', 'users.group_id=groups.id', 'left')
             ->group_by('users.id')
@@ -263,7 +263,7 @@ class Auth extends MY_Controller
                 'required' => 'required',
                 'placeholder' => lang('password'),
             );
-            $this->data['allow_reg'] = $this->Settings->allow_reg;
+//            $this->data['allow_reg'] = $this->Settings->allow_reg;
             if ($m == 'db') {
                 $this->data['message'] = lang('db_restored');
             } elseif ($m) {
@@ -525,7 +525,7 @@ class Auth extends MY_Controller
             $username = strtolower($this->input->post('username'));
             $email = strtolower($this->input->post('email'));
             $password = $this->input->post('password');
-            $doc_path=$this->input->post('first_name') ." ".$this->input->post('last_name')." (".$username.")";
+            $doc_path = $this->input->post('first_name') . " " . $this->input->post('last_name') . " (" . $username . ")";
             $notify = $this->input->post('notify');
 
             $additional_data = array(
@@ -543,8 +543,8 @@ class Auth extends MY_Controller
             $active = $this->input->post('status');
         }
         if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data, $active, $notify)) {
-            if (!file_exists('assets/uploads/docs/'.$doc_path)) {
-                mkdir('assets/uploads/docs/'.$doc_path, 0777, true);
+            if (!file_exists('assets/uploads/docs/' . $doc_path)) {
+                mkdir('assets/uploads/docs/' . $doc_path, 0777, true);
             }
             $this->session->set_flashdata('message', $this->ion_auth->messages());
             redirect("auth/users");
@@ -617,7 +617,7 @@ class Auth extends MY_Controller
                         'award_points' => $this->input->post('award_points'),
                         'view_right' => $this->input->post('view_right'),
                         'edit_right' => $this->input->post('edit_right'),
-                        'document_path' => $this->input->post('document_path'),
+//                        'document_path' => $this->input->post('document_path'),
                         'allow_discount' => $this->input->post('allow_discount'),
                     );
                 }
@@ -780,11 +780,6 @@ class Auth extends MY_Controller
     function register()
     {
         $this->data['title'] = "Register";
-        if (!$this->allow_reg) {
-            $this->session->set_flashdata('error', lang('registration_is_disabled'));
-            redirect("login");
-        }
-
         $this->form_validation->set_message('is_unique', lang('account_exists'));
         $this->form_validation->set_rules('first_name', lang('first_name'), 'required');
         $this->form_validation->set_rules('last_name', lang('last_name'), 'required');
@@ -800,15 +795,24 @@ class Auth extends MY_Controller
             $username = strtolower($this->input->post('username'));
             $email = strtolower($this->input->post('email'));
             $password = $this->input->post('password');
+            $doc_path = $this->input->post('first_name') . " " . $this->input->post('last_name') . " (" . $username . ")";
+            $notify = 1;
 
             $additional_data = array(
                 'first_name' => $this->input->post('first_name'),
                 'last_name' => $this->input->post('last_name'),
                 'company' => $this->input->post('company'),
                 'phone' => $this->input->post('phone'),
+                'country' => $this->input->post('country'),
+                'gender' => $this->input->post('gender'),
+                'document_path' => $doc_path,
+                'group_id' => $this->input->post('group') ? $this->input->post('group') : '3',
+                'view_right' => 0,
+                'edit_right' =>0
             );
+            $active = 1;
         }
-        if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data)) {
+        if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data,$active,$notify)) {
 
             $this->session->set_flashdata('message', $this->ion_auth->messages());
             redirect("login");
@@ -999,9 +1003,11 @@ class Auth extends MY_Controller
             $this->session->set_flashdata('warning', lang('disabled_in_demo'));
             redirect($_SERVER["HTTP_REFERER"]);
         }
-        if ($this->input->get('id')) { $id = $this->input->get('id'); }
+        if ($this->input->get('id')) {
+            $id = $this->input->get('id');
+        }
 
-        if ( ! $this->Owner || $id == $this->session->userdata('user_id')) {
+        if (!$this->Owner || $id == $this->session->userdata('user_id')) {
             $this->session->set_flashdata('warning', lang('access_denied'));
             redirect(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'welcome');
         }
@@ -1010,6 +1016,57 @@ class Auth extends MY_Controller
             //echo lang("user_deleted");
             $this->session->set_flashdata('message', 'user_deleted');
             redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+
+    function signup_user()
+    {
+
+        $this->data['title'] = "Create User";
+        $this->form_validation->set_rules('username', lang("username"), 'trim|is_unique[users.username]');
+        $this->form_validation->set_rules('email', lang("email"), 'trim|is_unique[users.email]');
+        $this->form_validation->set_rules('first_name', lang("first_name"), 'trim|required');
+        $this->form_validation->set_rules('last_name', lang("last_name"), 'trim|required');
+        $this->form_validation->set_rules('country', lang("country"), 'trim|required');
+
+        if ($this->form_validation->run() == true) {
+
+            $username = strtolower($this->input->post('username'));
+            $email = strtolower($this->input->post('email'));
+            $password = $this->input->post('password');
+            $doc_path=$this->input->post('first_name') ." ".$this->input->post('last_name')." (".$username.")";
+            $notify = 1;
+            $active = 1;
+
+            $additional_data = array(
+                'first_name' => $this->input->post('first_name'),
+                'last_name' => $this->input->post('last_name'),
+                'company' => $this->input->post('company'),
+                'phone' => $this->input->post('phone'),
+                'country' => $this->input->post('country'),
+                'gender' => $this->input->post('gender'),
+                'document_path' => $doc_path,
+                'group_id' => '3',
+                'view_right' => 0,
+                'edit_right' => 0,
+            );
+            $active = $this->input->post('status');
+        }
+        if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data, $active, $notify)) {
+            if (!file_exists('assets/uploads/docs/'.$doc_path)) {
+                mkdir('assets/uploads/docs/'.$doc_path, 0777, true);
+            }
+            $this->session->set_flashdata('message', $this->ion_auth->messages());
+            redirect("auth/login");
+
+        } else {
+
+            $this->data['error'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('error')));
+            $this->data['groups'] = $this->ion_auth->groups()->result_array();
+            $this->data['countries'] = $this->site->getAllCountry();
+            $bc = array(array('link' => site_url('login'), 'page' => lang('Back_To_Login')));
+            $meta = array('page_title' => lang('users'), 'bc' => $bc);
+            $this->signup_page_construct('auth/signup', $meta, $this->data);
         }
     }
 

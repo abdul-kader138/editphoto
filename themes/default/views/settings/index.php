@@ -206,6 +206,12 @@ $ps = array('0' => lang("disable"), '1' => lang("enable"));
                                 <?= form_input('symbol', $Settings->symbol, 'class="form-control" id="symbol" style="width:100%;"'); ?>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <?= lang('Tax', 'Tax'); ?>
+                                <?= form_input('tax', $Settings->tax, 'class="form-control" id="tax" style="width:100%;"'); ?>
+                            </div>
+                        </div>
                     </fieldset>
                 </div>
             </div>

@@ -6,7 +6,7 @@
             "aLengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "<?= lang('all') ?>"]],
             "iDisplayLength": <?= $Settings->rows_per_page ?>,
             'bProcessing': true, 'bServerSide': true,
-            'sAjaxSource': '<?= site_url('system_settings/getUnits') ?>',
+            'sAjaxSource': '<?= site_url('system_settings/get_add_ons') ?>',
             'fnServerData': function (sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "<?= $this->security->get_csrf_token_name() ?>",
@@ -14,14 +14,14 @@
                 });
                 $.ajax({'dataType': 'json', 'type': 'POST', 'url': sSource, 'data': aoData, 'success': fnCallback});
             },
-            "aoColumns": [{"bSortable": false, "mRender": checkbox}, null, null, null, null, null, {"bSortable": false}]
+            "aoColumns": [{"bSortable": false, "mRender": checkbox}, null,null, null, null, {"bSortable": false}]
         });
     });
 </script>
-<?= form_open('system_settings/unit_actions', 'id="action-form"') ?>
+<?= form_open('system_settings/addOns_actions', 'id="action-form"') ?>
 <div class="box">
     <div class="box-header">
-        <h2 class="blue"><i class="fa-fw fa fa-folder-open"></i><?= lang('units'); ?></h2>
+        <h2 class="blue"><i class="fa-fw fa fa-folder-open"></i><?= lang('Add_-Ons'); ?></h2>
 
         <div class="box-icon">
             <ul class="btn-tasks">
@@ -31,24 +31,14 @@
                     </a>
                     <ul class="dropdown-menu pull-right tasks-menus" role="menu" aria-labelledby="dLabel">
                         <li>
-                            <a href="<?php echo site_url('system_settings/add_unit'); ?>" data-toggle="modal" data-target="#myModal">
-                                <i class="fa fa-plus"></i> <?= lang('add_unit') ?>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" id="excel" data-action="export_excel">
-                                <i class="fa fa-file-excel-o"></i> <?= lang('export_to_excel') ?>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" id="pdf" data-action="export_pdf">
-                                <i class="fa fa-file-pdf-o"></i> <?= lang('export_to_pdf') ?>
+                            <a href="<?php echo site_url('system_settings/addAddOns'); ?>" data-toggle="modal" data-target="#myModal">
+                                <i class="fa fa-plus"></i> <?= lang('Add_Add_-Ons') ?>
                             </a>
                         </li>
                         <li class="divider"></li>
                         <li>
                             <a href="#" id="delete" data-action="delete">
-                                <i class="fa fa-trash-o"></i> <?= lang('delete_units') ?>
+                                <i class="fa fa-trash-o"></i> <?= lang('Delete_Add_-Ons') ?>
                             </a>
                         </li>
                     </ul>
@@ -67,17 +57,16 @@
                                 <th style="min-width:30px; width: 30px; text-align: center;">
                                     <input class="checkbox checkth" type="checkbox" name="check"/>
                                 </th>
-                                <th><?= lang("unit_code"); ?></th>
-                                <th><?= lang("unit_name"); ?></th>
-                                <th><?= lang("base_unit"); ?></th>
-                                <th><?= lang("operator"); ?></th>
-                                <th><?= lang("operation_value"); ?></th>
+                                <th><?= lang("Code"); ?></th>
+                                <th><?= lang("Name"); ?></th>
+                                <th><?= lang("price"); ?></th>
+                                <th><?= lang("Description"); ?></th>
                                 <th style="width:100px;"><?= lang("actions"); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td colspan="7" class="dataTables_empty">
+                                <td colspan="6" class="dataTables_empty">
                                     <?= lang('loading_data_from_server') ?>
                                 </td>
                             </tr>
